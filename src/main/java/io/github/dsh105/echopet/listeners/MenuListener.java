@@ -125,8 +125,10 @@ public class MenuListener implements Listener {
 
 								LivingPet pet = null;
 
+								boolean hasNoPayPerm = player.hasPermission("echopet.nopay.*") || player.hasPermission("echopet.pet.nopay.*") || player.hasPermission("echopet.pet.nopay.type.*") || player.hasPermission("echopet.pet.nopay.type." + i.petType);
+								
 								economyCheck:
-									if (economy != null && cost > 0){
+									if (economy != null && cost > 0 && !hasNoPayPerm){
 										if (!economy.has(player.getName(), cost)){
 											player.sendMessage(ChatColor.DARK_RED + "You don't have enough " + economy.currencyNamePlural() + " to get this pet!");
 											
@@ -144,8 +146,7 @@ public class MenuListener implements Listener {
 								if (pet != null) {
 									ec.PH.saveFileData("autosave", pet);
 									ec.SPH.saveToDatabase(pet, false);
-									Lang.sendTo(player, Lang.CREATE_PET.toString()
-											.replace("%type%", StringUtil.capitalise(i.petType.toString().replace("_", ""))));
+									Lang.sendTo(player, Lang.CREATE_PET.toString().replace("%type%", StringUtil.capitalise(i.petType.toString().replace("_", ""))));
 								}
 								player.closeInventory();
 							}
