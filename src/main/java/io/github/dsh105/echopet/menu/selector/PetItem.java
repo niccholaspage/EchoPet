@@ -69,10 +69,9 @@ public enum PetItem {
 		boolean hasPerm = p.hasPermission("echopet.*") || p.hasPermission("echopet.pet.*") || p.hasPermission("echopet.pet.type.*") || p.hasPermission("echopet.pet.type." + PetUtil.getPetPerm(this.petType));
 		meta.setDisplayName((hasPerm ? ChatColor.GREEN : ChatColor.RED) + this.name);
 
-
 		boolean hasNoPayPerm = p.hasPermission("echopet.nopay.*") || p.hasPermission("echopet.pet.nopay.*") || p.hasPermission("echopet.pet.nopay.type.*") || p.hasPermission("echopet.pet.nopay.type." + PetUtil.getPetPerm(this.petType));
 
-		if (hasNoPayPerm){
+		if (!hasNoPayPerm){
 			ArrayList<String> lore = new ArrayList<String>();
 
 			EchoPet plugin = EchoPet.getPluginInstance();
