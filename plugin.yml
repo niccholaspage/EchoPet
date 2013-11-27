@@ -1,9 +1,8 @@
-name: ${project.name}
-version: ${project.version}
+name: EchoPet
+version: 2.1.0
 author: DSH105
 description: Mobs Under Your Control
-website: ${project.url}
-main: ${main.class}
+main: io.github.dsh105.echopet.EchoPet
 commands:
     ecupdate:
         description: Update the EchoPet plugin.

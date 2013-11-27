@@ -1,7 +1,11 @@
 package io.github.dsh105.echopet.menu.selector;
 
+import java.util.ArrayList;
+
+import io.github.dsh105.echopet.EchoPet;
 import io.github.dsh105.echopet.entity.living.data.PetType;
 import io.github.dsh105.echopet.util.PetUtil;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -64,6 +68,18 @@ public enum PetItem {
         ItemMeta meta = i.getItemMeta();
         boolean hasPerm = p.hasPermission("echopet.*") || p.hasPermission("echopet.pet.*") || p.hasPermission("echopet.pet.type.*") || p.hasPermission("echopet.pet.type." + PetUtil.getPetPerm(this.petType));
         meta.setDisplayName((hasPerm ? ChatColor.GREEN : ChatColor.RED) + this.name);
+
+        ArrayList<String> lore = new ArrayList<String>();
+        
+        EchoPet plugin = EchoPet.getPluginInstance();
+        
+        double cost = plugin.options.getCost(petType);
+        
+        if (plugin.getEconomy() != null && cost > 0){
+            lore.add(ChatColor.GREEN + plugin.getEconomy().format(cost));
+        }
+        
+        meta.setLore(lore);
         //meta.setLore(this.lore);
         i.setItemMeta(meta);
         return i;

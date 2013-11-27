@@ -66,6 +66,10 @@ public class ConfigOptions extends Options {
     public double getRideJumpHeight(PetType petType) {
         return this.config.getDouble("pets." + petType.toString().toLowerCase().replace("_", " ") + ".rideJump", 0.5D);
     }
+    
+    public double getCost(PetType petType){
+    	return this.config.getDouble("pets." + petType.toString().toLowerCase().replace("_", " ") + ".cost", 0D);
+    }
 
     public boolean useSql() {
         return this.config.getBoolean("sql.use", false);
