@@ -37,7 +37,7 @@ public class PetSelector implements Menu {
         this.inv.setItem(this.size - 3, SelectorItem.TOGGLE.getItem());
         this.inv.setItem(this.size - 4, SelectorItem.CALL.getItem());
 
-        this.inv.setItem(this.size - 6, SelectorItem.HAT.getItem());
+        //this.inv.setItem(this.size - 6, SelectorItem.HAT.getItem());
         this.inv.setItem(this.size - 7, SelectorItem.RIDE.getItem());
 
         this.inv.setItem(this.size - 9, SelectorItem.MENU.getItem());

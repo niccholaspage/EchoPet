@@ -102,7 +102,7 @@ public class MenuListener implements Listener {
 							}
 						}
 					}
-					if (inv.getItem(slot).equals(SelectorItem.HAT.getItem())) {
+					/*if (inv.getItem(slot).equals(SelectorItem.HAT.getItem())) {
 						LivingPet pet = EchoPet.getPluginInstance().PH.getPet(player);
 						if (pet != null) {
 							if (Perm.hasTypePerm(player, true, Perm.BASE_HAT, pet.getPetType())) {
@@ -110,7 +110,7 @@ public class MenuListener implements Listener {
 								player.closeInventory();
 							}
 						}
-					}
+					}*/
 					if (inv.getItem(slot).equals(SelectorItem.MENU.getItem())) {
 						if (Perm.BASE_MENU.hasPerm(player, true, false)) {
 							player.closeInventory();
@@ -147,6 +147,8 @@ public class MenuListener implements Listener {
 									}else {
 										pet = PetHandler.getInstance().createPet(player, i.petType, true);
 									}
+								}else {
+									pet = PetHandler.getInstance().createPet(player, i.petType, true);
 								}
 								
 								if (pet != null) {

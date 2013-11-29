@@ -12,7 +12,7 @@ public enum SelectorItem {
     TOGGLE(Material.BONE, 1, (short) 0, false, ChatColor.YELLOW + "Toggle Pet"),
     CALL(Material.ENDER_PEARL, 1, (short) 0, false, ChatColor.YELLOW + "Call Pet"),
     RIDE(Material.CARROT_STICK, 1, (short) 0, false, ChatColor.YELLOW + "Ride Pet"),
-    HAT(Material.IRON_HELMET, 1, (short) 0, false, ChatColor.YELLOW + "Hat Pet"),
+    //HAT(Material.IRON_HELMET, 1, (short) 0, false, ChatColor.YELLOW + "Hat Pet"),
     MENU(Material.WORKBENCH, 1, (short) 0, false, ChatColor.YELLOW + "Open PetMenu"),
     CLOSE(Material.BOOK, 1, (short) 0, false, ChatColor.YELLOW + "Close");
 

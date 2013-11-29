@@ -12,7 +12,7 @@ public class MenuUtil {
     public static ArrayList<MenuOption> createOptionList(PetType pt) {
         ArrayList<MenuOption> options = new ArrayList<MenuOption>();
         int i = 0;
-        options.add(new MenuOption(i++, MenuItem.HAT));
+        //options.add(new MenuOption(i++, MenuItem.HAT));
         options.add(new MenuOption(i++, MenuItem.RIDE));
         if (pt == PetType.BLAZE) {
             options.add(new MenuOption(i++, MenuItem.FIRE));
