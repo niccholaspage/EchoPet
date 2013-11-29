@@ -13,6 +13,7 @@ import io.github.dsh105.echopet.menu.main.MenuItem;
 import io.github.dsh105.echopet.menu.main.PetMenu;
 import io.github.dsh105.echopet.menu.selector.PetItem;
 import io.github.dsh105.echopet.menu.selector.SelectorItem;
+import io.github.dsh105.echopet.mysql.SQLPetHandler;
 import io.github.dsh105.echopet.permissions.Perm;
 import io.github.dsh105.echopet.util.*;
 import net.milkbowl.vault.economy.Economy;
@@ -127,6 +128,7 @@ public class MenuListener implements Listener {
 
 								boolean hasNoPayPerm = player.hasPermission("echopet.nopay.*") || player.hasPermission("echopet.pet.nopay.*") || player.hasPermission("echopet.pet.nopay.type.*") || player.hasPermission("echopet.pet.nopay.type." + i.petType);
 								
+								if (!SQLPetHandler.getInstance().isBought(player, i.petType)){
 								economyCheck:
 									if (economy != null && cost > 0 && !hasNoPayPerm){
 										if (!economy.has(player.getName(), cost)){
@@ -140,9 +142,13 @@ public class MenuListener implements Listener {
 										player.sendMessage(ChatColor.GREEN + "You spent " + economy.format(cost) + " on this pet!");
 
 										pet = PetHandler.getInstance().createPet(player, i.petType, true);
+										
+										SQLPetHandler.getInstance().saveBoughtPetToDatabase(player, i.petType);
 									}else {
 										pet = PetHandler.getInstance().createPet(player, i.petType, true);
 									}
+								}
+								
 								if (pet != null) {
 									ec.PH.saveFileData("autosave", pet);
 									ec.SPH.saveToDatabase(pet, false);

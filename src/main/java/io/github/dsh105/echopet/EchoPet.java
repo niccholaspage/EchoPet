@@ -191,6 +191,13 @@ public class EchoPet extends JavaPlugin {
 				} catch (SQLException e) {
 					Logger.log(Logger.LogLevel.SEVERE, "`Pets` Table generation failed [MySQL DataBase: " + db + "].", e, true);
 				}
+				
+				try {
+					con.prepareStatement("CREATE TABLE IF NOT EXISTS Pets_Bought (OwnerName varchar(255), PetType varchar(255));").executeUpdate();
+				}catch (SQLException e){
+					Logger.log(Logger.LogLevel.SEVERE, "Pets Bought Table generation failed [MySQL DataBase: " + db + "].", e, true);
+				}
+				
 				this.sqlRefresh = new SQLRefresh(getMainConfig().getInt("sql.timeout") * 20 * 60);
 			}
 		}

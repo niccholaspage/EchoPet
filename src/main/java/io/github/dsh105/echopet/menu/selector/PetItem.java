@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import io.github.dsh105.echopet.EchoPet;
 import io.github.dsh105.echopet.entity.living.data.PetType;
+import io.github.dsh105.echopet.mysql.SQLPetHandler;
 import io.github.dsh105.echopet.util.PetUtil;
 
 import org.bukkit.ChatColor;
@@ -69,11 +70,13 @@ public enum PetItem {
 		boolean hasPerm = p.hasPermission("echopet.*") || p.hasPermission("echopet.pet.*") || p.hasPermission("echopet.pet.type.*") || p.hasPermission("echopet.pet.type." + PetUtil.getPetPerm(this.petType));
 		meta.setDisplayName((hasPerm ? ChatColor.GREEN : ChatColor.RED) + this.name);
 
+		ArrayList<String> lore = new ArrayList<String>();
+
 		boolean hasNoPayPerm = p.hasPermission("echopet.nopay.*") || p.hasPermission("echopet.pet.nopay.*") || p.hasPermission("echopet.pet.nopay.type.*") || p.hasPermission("echopet.pet.nopay.type." + PetUtil.getPetPerm(this.petType));
 
-		if (!hasNoPayPerm){
-			ArrayList<String> lore = new ArrayList<String>();
-
+		if (SQLPetHandler.getInstance().isBought(p, petType)){
+			lore.add(ChatColor.GREEN + "Purchased");
+		}else if (!hasNoPayPerm){
 			EchoPet plugin = EchoPet.getPluginInstance();
 
 			double cost = plugin.options.getCost(petType);
@@ -81,10 +84,10 @@ public enum PetItem {
 			if (plugin.getEconomy() != null && cost > 0){
 				lore.add((hasPerm ? ChatColor.GREEN : ChatColor.RED) + plugin.getEconomy().format(cost));
 			}
-
-			meta.setLore(lore);
 		}
-		//meta.setLore(this.lore);
+
+		meta.setLore(lore);
+
 		i.setItemMeta(meta);
 		return i;
 	}
