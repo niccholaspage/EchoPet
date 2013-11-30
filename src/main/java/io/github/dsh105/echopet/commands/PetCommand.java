@@ -10,6 +10,7 @@ import io.github.dsh105.echopet.menu.main.MenuOption;
 import io.github.dsh105.echopet.menu.main.PetMenu;
 import io.github.dsh105.echopet.menu.selector.PetSelector;
 import io.github.dsh105.echopet.menu.selector.SelectorItem;
+import io.github.dsh105.echopet.mysql.SQLPetHandler;
 import io.github.dsh105.echopet.permissions.Perm;
 import io.github.dsh105.echopet.util.*;
 import org.bukkit.ChatColor;
@@ -308,6 +309,18 @@ public class PetCommand implements CommandExecutor {
 
                 if (petType == null || petDataList == null) {
                     return true;
+                }
+                
+                Player player = (Player) sender;
+                
+                double cost = ec.options.getCost(petType);
+                
+                if (cost > 0){
+                	boolean hasNoPayPerm = player.hasPermission("echopet.nopay.*") || player.hasPermission("echopet.pet.nopay.*") || player.hasPermission("echopet.pet.nopay.type.*") || player.hasPermission("echopet.pet.nopay.type." + petType);
+
+                	if (!hasNoPayPerm && !SQLPetHandler.getInstance().isBought(player, petType)){
+                		return true;
+                	}
                 }
 
                 if (Perm.hasTypePerm(sender, true, Perm.BASE_PETTYPE, false, petType)) {
