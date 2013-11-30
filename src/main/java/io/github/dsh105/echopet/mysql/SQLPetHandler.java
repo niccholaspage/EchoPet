@@ -4,7 +4,6 @@ import io.github.dsh105.echopet.EchoPet;
 import io.github.dsh105.echopet.entity.living.data.PetData;
 import io.github.dsh105.echopet.data.PetHandler;
 import io.github.dsh105.echopet.entity.living.data.PetType;
-import io.github.dsh105.echopet.data.UnorganisedPetData;
 import io.github.dsh105.echopet.entity.living.LivingPet;
 import io.github.dsh105.echopet.logger.Logger;
 import io.github.dsh105.echopet.util.SQLUtil;
@@ -82,10 +81,10 @@ public class SQLPetHandler {
 								"VALUES (?)";
 					}
 
-					String duplicate = "ON DUPLICATE KEY UPDATE " + mountPrefix + "PetType='" + p.getPetType().toString() + "', " + mountPrefix + "PetName='" + p.getNameToString() + "'";
+					String duplicate = "ON DUPLICATE KEY UPDATE " + mountPrefix + "PetType=\"" + p.getPetType().toString() + "\", " + mountPrefix + "PetName=\"" + p.getNameToString() + "\"";
 
 					//PreparedStatement ps = con.prepareStatement(sql);
-					String state = "'" + p.getOwner().getName() + "', '" + p.getPetType().toString() + "', '" + p.getNameToString() + "'";
+					String state = "\"" + p.getOwner().getName() + "\", \"" + p.getPetType().toString() + "\", \"" + p.getNameToString() + "\"";
 
 					state = state + (data1.equalsIgnoreCase("") ? "" : ", " + data1);
 					duplicate = duplicate + SQLUtil.serialiseUpdate(p.getActiveData(), true, isMount);
