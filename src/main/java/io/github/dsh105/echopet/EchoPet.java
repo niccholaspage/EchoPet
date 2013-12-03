@@ -306,6 +306,8 @@ public class EchoPet extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		PH.removeAllPets();
+		
+		getServer().getScheduler().cancelTasks(this);
 	}
 
 	@Override

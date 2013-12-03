@@ -127,35 +127,33 @@ public class MenuListener implements Listener {
 								LivingPet pet = null;
 
 								boolean hasNoPayPerm = player.hasPermission("echopet.nopay.*") || player.hasPermission("echopet.pet.nopay.*") || player.hasPermission("echopet.pet.nopay.type.*") || player.hasPermission("echopet.pet.nopay.type." + i.petType);
-								
+
 								if (!SQLPetHandler.getInstance().isBought(player, i.petType)){
-								economyCheck:
 									if (economy != null && cost > 0 && !hasNoPayPerm){
 										if (!economy.has(player.getName(), cost)){
 											player.sendMessage(ChatColor.DARK_RED + "You don't have enough " + economy.currencyNamePlural() + " to get this pet!");
-											
-											break economyCheck;
-										}
-										
-										economy.withdrawPlayer(player.getName(), cost);
-										
-										player.sendMessage(ChatColor.GREEN + "You spent " + economy.format(cost) + " on this pet!");
+										}else {
+											economy.withdrawPlayer(player.getName(), cost);
 
-										pet = PetHandler.getInstance().createPet(player, i.petType, true);
-										
-										SQLPetHandler.getInstance().saveBoughtPetToDatabase(player, i.petType);
+											player.sendMessage(ChatColor.GREEN + "You spent " + economy.format(cost) + " on this pet!");
+
+											pet = PetHandler.getInstance().createPet(player, i.petType, true);
+
+											SQLPetHandler.getInstance().saveBoughtPetToDatabase(player, i.petType);
+										}
 									}else {
 										pet = PetHandler.getInstance().createPet(player, i.petType, true);
 									}
 								}else {
 									pet = PetHandler.getInstance().createPet(player, i.petType, true);
 								}
-								
+
 								if (pet != null) {
 									ec.PH.saveFileData("autosave", pet);
 									ec.SPH.saveToDatabase(pet, false);
 									Lang.sendTo(player, Lang.CREATE_PET.toString().replace("%type%", StringUtil.capitalise(i.petType.toString().replace("_", ""))));
 								}
+
 								player.closeInventory();
 							}
 						}
