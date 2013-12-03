@@ -67,6 +67,10 @@ public class ConfigOptions extends Options {
     public double getCost(PetType petType){
     	return this.config.getDouble("pets." + petType.toString().toLowerCase().replace("_", " ") + ".cost", 0D);
     }
+    
+    public String getLore(PetType petType){
+    	return this.config.getString("pets." + petType.toString().toLowerCase().replace("_", " ") + ".lore", null);
+    }
 
     public boolean useSql() {
         return this.config.getBoolean("sql.use", false);

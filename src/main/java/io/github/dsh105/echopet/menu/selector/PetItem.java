@@ -65,21 +65,30 @@ public enum PetItem {
 		ItemStack i = new ItemStack(this.mat, this.amount, this.data);
 		ItemMeta meta = i.getItemMeta();
 		boolean hasPerm = p.hasPermission("echopet.*") || p.hasPermission("echopet.pet.*") || p.hasPermission("echopet.pet.type.*") || p.hasPermission("echopet.pet.type." + PetUtil.getPetPerm(this.petType));
-		meta.setDisplayName((hasPerm ? ChatColor.GREEN : ChatColor.RED) + this.name);
+		
+		ChatColor color = (hasPerm ? ChatColor.GREEN : ChatColor.RED);
+		
+		meta.setDisplayName(color + this.name);
 
 		ArrayList<String> lore = new ArrayList<String>();
+		
+		EchoPet plugin = EchoPet.getPluginInstance();
 
+		String loreDesc = plugin.options.getLore(petType);
+		
+		if (loreDesc != null && loreDesc.length() > 0){
+			lore.add(color + "Lore: " + loreDesc);
+		}
+		
 		boolean hasNoPayPerm = p.hasPermission("echopet.nopay.*") || p.hasPermission("echopet.pet.nopay.*") || p.hasPermission("echopet.pet.nopay.type.*") || p.hasPermission("echopet.pet.nopay.type." + PetUtil.getPetPerm(this.petType));
 
 		if (SQLPetHandler.getInstance().isBought(p, petType)){
 			lore.add(ChatColor.GREEN + "Purchased");
 		}else if (!hasNoPayPerm){
-			EchoPet plugin = EchoPet.getPluginInstance();
-
 			double cost = plugin.options.getCost(petType);
 
 			if (plugin.getEconomy() != null && cost > 0){
-				lore.add((hasPerm ? ChatColor.GREEN : ChatColor.RED) + plugin.getEconomy().format(cost));
+				lore.add(color + plugin.getEconomy().format(cost));
 			}
 		}
 
