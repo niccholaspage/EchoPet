@@ -25,7 +25,16 @@ public class PetSelector implements Menu {
 
     public void setup() {
         int count = 0;
-        for (PetItem item : PetItem.values()) {
+        
+        PetItem[] items = null;
+        
+        if (EchoPet.getPluginInstance().options.isSortingByCost()){
+        	items = PetItem.valuesByCost(viewer);
+        }else {
+        	items = PetItem.values();
+        }
+        
+        for (PetItem item : items) {
 
             if (EchoPet.getPluginInstance().options.allowPetType(item.petType)) {
                 this.inv.setItem(count, item.getItem(this.viewer));

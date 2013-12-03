@@ -1,6 +1,10 @@
 package io.github.dsh105.echopet.menu.selector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import io.github.dsh105.echopet.EchoPet;
 import io.github.dsh105.echopet.entity.living.data.PetType;
@@ -65,21 +69,23 @@ public enum PetItem {
 		ItemStack i = new ItemStack(this.mat, this.amount, this.data);
 		ItemMeta meta = i.getItemMeta();
 		boolean hasPerm = p.hasPermission("echopet.*") || p.hasPermission("echopet.pet.*") || p.hasPermission("echopet.pet.type.*") || p.hasPermission("echopet.pet.type." + PetUtil.getPetPerm(this.petType));
-		
+
 		ChatColor color = (hasPerm ? ChatColor.GREEN : ChatColor.RED);
-		
+
 		meta.setDisplayName(color + this.name);
 
 		ArrayList<String> lore = new ArrayList<String>();
-		
+
 		EchoPet plugin = EchoPet.getPluginInstance();
 
 		String loreDesc = plugin.options.getLore(petType);
-		
+
 		if (loreDesc != null && loreDesc.length() > 0){
-			lore.add(color + "Lore: " + loreDesc);
+			loreDesc = loreDesc.replace("&", "\u00A7");
+
+			lore.add(color + loreDesc);
 		}
-		
+
 		boolean hasNoPayPerm = p.hasPermission("echopet.nopay.*") || p.hasPermission("echopet.pet.nopay.*") || p.hasPermission("echopet.pet.nopay.type.*") || p.hasPermission("echopet.pet.nopay.type." + PetUtil.getPetPerm(this.petType));
 
 		if (SQLPetHandler.getInstance().isBought(p, petType)){
@@ -96,5 +102,32 @@ public enum PetItem {
 
 		i.setItemMeta(meta);
 		return i;
+	}
+
+	public static PetItem[] valuesByCost(final Player player){
+		List<PetItem> petItems = new ArrayList<PetItem>(Arrays.asList(values()));
+
+		final EchoPet plugin = EchoPet.getPluginInstance();
+		
+		Collections.sort(petItems, new Comparator<PetItem>() {
+			@Override
+			public int compare(PetItem p1, PetItem p2) {
+				PetType type1 = p1.petType;
+				
+				PetType type2 = p2.petType;
+				
+				double cost1 = plugin.options.getCost(type1);
+				
+				if (SQLPetHandler.getInstance().isBought(player, type1)){
+					cost1 = 0;
+				}
+				
+				double cost2 = plugin.options.getCost(type2);
+				
+				return (int) (cost1 - cost2);
+			}
+		});
+		
+		return (PetItem[]) petItems.toArray(new PetItem[petItems.size()]);
 	}
 }

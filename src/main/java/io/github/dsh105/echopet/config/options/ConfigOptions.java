@@ -71,6 +71,10 @@ public class ConfigOptions extends Options {
     public String getLore(PetType petType){
     	return this.config.getString("pets." + petType.toString().toLowerCase().replace("_", " ") + ".lore", null);
     }
+    
+    public boolean isSortingByCost(){
+    	return this.config.getBoolean("sortbycost", false);
+    }
 
     public boolean useSql() {
         return this.config.getBoolean("sql.use", false);
