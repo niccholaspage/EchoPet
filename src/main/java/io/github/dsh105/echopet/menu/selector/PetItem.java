@@ -94,7 +94,7 @@ public enum PetItem {
 			double cost = plugin.options.getCost(petType);
 
 			if (plugin.getEconomy() != null && cost > 0){
-				lore.add(color + plugin.getEconomy().format(cost));
+				lore.add(ChatColor.YELLOW + plugin.getEconomy().format(cost));
 			}
 		}
 
