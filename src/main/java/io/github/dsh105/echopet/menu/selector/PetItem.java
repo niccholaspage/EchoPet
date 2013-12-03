@@ -88,7 +88,7 @@ public enum PetItem {
 
 		boolean hasNoPayPerm = p.hasPermission("echopet.nopay.*") || p.hasPermission("echopet.pet.nopay.*") || p.hasPermission("echopet.pet.nopay.type.*") || p.hasPermission("echopet.pet.nopay.type." + PetUtil.getPetPerm(this.petType));
 
-		if (SQLPetHandler.getInstance().isBought(p, petType)){
+		if (SQLPetHandler.getInstance().isBought(p, petType) || hasNoPayPerm){
 			lore.add(ChatColor.GREEN + "Purchased");
 		}else if (!hasNoPayPerm){
 			double cost = plugin.options.getCost(petType);
@@ -104,7 +104,7 @@ public enum PetItem {
 		return i;
 	}
 
-	public static PetItem[] valuesByCost(final Player player){
+	public static PetItem[] valuesByCost(final Player p){
 		List<PetItem> petItems = new ArrayList<PetItem>(Arrays.asList(values()));
 
 		final EchoPet plugin = EchoPet.getPluginInstance();
@@ -118,7 +118,9 @@ public enum PetItem {
 				
 				double cost1 = plugin.options.getCost(type1);
 				
-				if (SQLPetHandler.getInstance().isBought(player, type1)){
+				boolean hasNoPayPerm = p.hasPermission("echopet.nopay.*") || p.hasPermission("echopet.pet.nopay.*") || p.hasPermission("echopet.pet.nopay.type.*") || p.hasPermission("echopet.pet.nopay.type." + PetUtil.getPetPerm(type1));
+				
+				if (SQLPetHandler.getInstance().isBought(p, type1)){
 					cost1 = 0;
 				}
 				
