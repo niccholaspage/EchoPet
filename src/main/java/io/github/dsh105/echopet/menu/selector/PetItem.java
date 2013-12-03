@@ -120,7 +120,7 @@ public enum PetItem {
 				
 				boolean hasNoPayPerm = p.hasPermission("echopet.nopay.*") || p.hasPermission("echopet.pet.nopay.*") || p.hasPermission("echopet.pet.nopay.type.*") || p.hasPermission("echopet.pet.nopay.type." + PetUtil.getPetPerm(type1));
 				
-				if (SQLPetHandler.getInstance().isBought(p, type1)){
+				if (SQLPetHandler.getInstance().isBought(p, type1) || hasNoPayPerm){
 					cost1 = 0;
 				}
 				
