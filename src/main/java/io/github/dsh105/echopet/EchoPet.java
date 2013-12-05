@@ -14,35 +14,6 @@ import io.github.dsh105.echopet.entity.living.data.PetData;
 import io.github.dsh105.echopet.data.PetHandler;
 import io.github.dsh105.echopet.entity.living.data.PetType;
 import io.github.dsh105.echopet.entity.living.EntityLivingPet;
-import io.github.dsh105.echopet.entity.living.type.bat.EntityBatPet;
-import io.github.dsh105.echopet.entity.living.type.blaze.EntityBlazePet;
-import io.github.dsh105.echopet.entity.living.type.cavespider.EntityCaveSpiderPet;
-import io.github.dsh105.echopet.entity.living.type.chicken.EntityChickenPet;
-import io.github.dsh105.echopet.entity.living.type.cow.EntityCowPet;
-import io.github.dsh105.echopet.entity.living.type.creeper.EntityCreeperPet;
-import io.github.dsh105.echopet.entity.living.type.enderdragon.EntityEnderDragonPet;
-import io.github.dsh105.echopet.entity.living.type.enderman.EntityEndermanPet;
-import io.github.dsh105.echopet.entity.living.type.ghast.EntityGhastPet;
-import io.github.dsh105.echopet.entity.living.type.giant.EntityGiantPet;
-import io.github.dsh105.echopet.entity.living.type.horse.EntityHorsePet;
-import io.github.dsh105.echopet.entity.living.type.irongolem.EntityIronGolemPet;
-import io.github.dsh105.echopet.entity.living.type.magmacube.EntityMagmaCubePet;
-import io.github.dsh105.echopet.entity.living.type.mushroomcow.EntityMushroomCowPet;
-import io.github.dsh105.echopet.entity.living.type.ocelot.EntityOcelotPet;
-import io.github.dsh105.echopet.entity.living.type.pig.EntityPigPet;
-import io.github.dsh105.echopet.entity.living.type.pigzombie.EntityPigZombiePet;
-import io.github.dsh105.echopet.entity.living.type.sheep.EntitySheepPet;
-import io.github.dsh105.echopet.entity.living.type.silverfish.EntitySilverfishPet;
-import io.github.dsh105.echopet.entity.living.type.skeleton.EntitySkeletonPet;
-import io.github.dsh105.echopet.entity.living.type.slime.EntitySlimePet;
-import io.github.dsh105.echopet.entity.living.type.snowman.EntitySnowmanPet;
-import io.github.dsh105.echopet.entity.living.type.spider.EntitySpiderPet;
-import io.github.dsh105.echopet.entity.living.type.squid.EntitySquidPet;
-import io.github.dsh105.echopet.entity.living.type.villager.EntityVillagerPet;
-import io.github.dsh105.echopet.entity.living.type.witch.EntityWitchPet;
-import io.github.dsh105.echopet.entity.living.type.wither.EntityWitherPet;
-import io.github.dsh105.echopet.entity.living.type.wolf.EntityWolfPet;
-import io.github.dsh105.echopet.entity.living.type.zombie.EntityZombiePet;
 import io.github.dsh105.echopet.listeners.*;
 import io.github.dsh105.echopet.logger.ConsoleLogger;
 import io.github.dsh105.echopet.logger.Logger;
@@ -53,14 +24,14 @@ import io.github.dsh105.echopet.util.Lang;
 import io.github.dsh105.echopet.util.ReflectionUtil;
 import io.github.dsh105.echopet.util.SQLUtil;
 import net.milkbowl.vault.economy.Economy;
-import net.minecraft.server.v1_6_R3.EntityTypes;
+import net.minecraft.server.v1_7_R1.EntityTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_6_R3.CraftServer;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.craftbukkit.v1_7_R1.CraftServer;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -72,10 +43,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 public class EchoPet extends JavaPlugin {
-
-	public static EchoPet plugin;
+	private static EchoPet plugin;
+	private static Random random = new Random();
 
 	private YAMLConfigManager configManager;
 	private YAMLConfig petConfig;
@@ -109,16 +81,6 @@ public class EchoPet extends JavaPlugin {
 		plugin = this;
 		Logger.initiate();
 		ConsoleLogger.initiate();
-
-		/*// Make sure that the plugin is running under the correct version to prevent errors
-        if (!(Version.getNMSPackage()).equalsIgnoreCase(ReflectionUtil.getVersionString())) {
-            ConsoleLogger.log(ChatColor.RED + "EchoPet " + ChatColor.GOLD
-                    + this.getDescription().getVersion() + ChatColor.RED
-                    + " is only compatible with:");
-            ConsoleLogger.log(ChatColor.RED + "    " + Version.getMinecraftVersion() + "-" + Version.getCraftBukkitVersion() + ".");
-            ConsoleLogger.log(ChatColor.RED + "Initialisation failed. Please update the plugin.");
-            return;
-        }*/
 
 		this.api = new EchoPetAPI();
 
@@ -191,13 +153,6 @@ public class EchoPet extends JavaPlugin {
 				} catch (SQLException e) {
 					Logger.log(Logger.LogLevel.SEVERE, "`Pets` Table generation failed [MySQL DataBase: " + db + "].", e, true);
 				}
-				
-				try {
-					con.prepareStatement("CREATE TABLE IF NOT EXISTS Pets_Bought (OwnerName varchar(255), PetType varchar(255));").executeUpdate();
-				}catch (SQLException e){
-					Logger.log(Logger.LogLevel.SEVERE, "Pets Bought Table generation failed [MySQL DataBase: " + db + "].", e, true);
-				}
-				
 				this.sqlRefresh = new SQLRefresh(getMainConfig().getInt("sql.timeout") * 20 * 60);
 			}
 		}
@@ -210,18 +165,6 @@ public class EchoPet extends JavaPlugin {
 		// Check whether to start AutoSave
 		if (getMainConfig().getBoolean("autoSave")) {
 			AS = new AutoSave(getMainConfig().getInt("autoSaveTimer"));
-		}
-
-		Plugin vault = getServer().getPluginManager().getPlugin("Vault");
-
-		if (vault != null){
-			RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-
-			if (economyProvider == null){
-				economy = null;
-			}else {
-				economy = economyProvider.getProvider();
-			}
 		}
 
 		// Register custom commands
@@ -258,9 +201,10 @@ public class EchoPet extends JavaPlugin {
 		this.adminCmdString = adminCmdString;
 
 		// Register listeners
-		manager.registerEvents(new MenuListener(this), this);
-		manager.registerEvents(new PetEntityListener(this), this);
-		manager.registerEvents(new PetOwnerListener(this), this);
+		manager.registerEvents(new MenuListener(), this);
+		manager.registerEvents(new PetEntityListener(), this);
+		manager.registerEvents(new PetOwnerListener(), this);
+		manager.registerEvents(new ChunkListener(), this);
 
 		if (Hook.getVNP() != null) {
 			manager.registerEvents(new VanishListener(), this);
@@ -306,8 +250,6 @@ public class EchoPet extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		PH.removeAllPets();
-		
-		getServer().getScheduler().cancelTasks(this);
 	}
 
 	@Override
@@ -331,17 +273,16 @@ public class EchoPet extends JavaPlugin {
 	}
 
 	public void registerEntity(Class<? extends EntityLivingPet> clazz, String name, int id) {
-		Field field_c = null;
 		try {
-			field_c = EntityTypes.class.getDeclaredField("c");
-			Field field_e = EntityTypes.class.getDeclaredField("e");
-			field_c.setAccessible(true);
-			field_e.setAccessible(true);
+			Field field_d = EntityTypes.class.getDeclaredField("d");
+			Field field_f = EntityTypes.class.getDeclaredField("f");
+			field_d.setAccessible(true);
+			field_f.setAccessible(true);
 
-			Map<Class, String> c = (Map) field_c.get(field_c);
-			Map<Class, Integer> e = (Map) field_e.get(field_e);
+			Map<Class, String> d = (Map) field_d.get(field_d);
+			Map<Class, Integer> f = (Map) field_f.get(field_f);
 
-			Iterator i = c.keySet().iterator();
+			Iterator i = d.keySet().iterator();
 			while (i.hasNext()) {
 				Class cl = (Class) i.next();
 				if (cl.getCanonicalName().equals(clazz.getCanonicalName())) {
@@ -349,7 +290,7 @@ public class EchoPet extends JavaPlugin {
 				}
 			}
 
-			Iterator i2 = e.keySet().iterator();
+			Iterator i2 = f.keySet().iterator();
 			while (i2.hasNext()) {
 				Class cl = (Class) i2.next();
 				if (cl.getCanonicalName().equals(clazz.getCanonicalName())) {
@@ -357,8 +298,8 @@ public class EchoPet extends JavaPlugin {
 				}
 			}
 
-			c.put(clazz, name);
-			e.put(clazz, id);
+			d.put(clazz, name);
+			f.put(clazz, id);
 
 		} catch (Exception e) {
 			Logger.log(Logger.LogLevel.SEVERE, "Registration of Pet Entity [" + name + "] has failed. This Pet will not be available.", e, true);
@@ -369,8 +310,12 @@ public class EchoPet extends JavaPlugin {
 		return this.api;
 	}
 
-	public static EchoPet getPluginInstance() {
+	public static EchoPet getInstance() {
 		return plugin;
+	}
+
+	public static Random random() {
+		return random;
 	}
 
 	public Connection getSqlCon() {

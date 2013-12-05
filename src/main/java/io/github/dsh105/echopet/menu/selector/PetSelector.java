@@ -4,7 +4,6 @@ import io.github.dsh105.echopet.EchoPet;
 import io.github.dsh105.echopet.api.event.PetSelectMenuOpenEvent;
 import io.github.dsh105.echopet.menu.Menu;
 import io.github.dsh105.echopet.util.Lang;
-import io.github.dsh105.echopet.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -36,7 +35,7 @@ public class PetSelector implements Menu {
         
         for (PetItem item : items) {
 
-            if (EchoPet.getPluginInstance().options.allowPetType(item.petType)) {
+            if (EchoPet.getInstance().options.allowPetType(item.petType)) {
                 this.inv.setItem(count, item.getItem(this.viewer));
                 count++;
             }
@@ -54,7 +53,7 @@ public class PetSelector implements Menu {
 
     public void open(boolean sendMessage) {
         PetSelectMenuOpenEvent menuEvent = new PetSelectMenuOpenEvent(this.viewer);
-        EchoPet.getPluginInstance().getServer().getPluginManager().callEvent(menuEvent);
+        EchoPet.getInstance().getServer().getPluginManager().callEvent(menuEvent);
         if (menuEvent.isCancelled()) {
             return;
         }
