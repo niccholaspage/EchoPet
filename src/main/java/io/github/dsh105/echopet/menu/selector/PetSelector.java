@@ -27,7 +27,7 @@ public class PetSelector implements Menu {
         
         PetItem[] items = null;
         
-        if (EchoPet.getPluginInstance().options.isSortingByCost()){
+        if (EchoPet.getInstance().options.isSortingByCost()){
         	items = PetItem.valuesByCost(viewer);
         }else {
         	items = PetItem.values();

@@ -18,15 +18,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SQLPetHandler {
-
-<<<<<<< HEAD
 	public static SQLPetHandler getInstance() {
-		return EchoPet.getPluginInstance().SPH;
+		return EchoPet.getInstance().SPH;
 	}
 
 	public void updateDatabase(Player player, ArrayList<PetData> list, Boolean result, boolean isMount) {
-		if (EchoPet.getPluginInstance().options.useSql()) {
-			Connection con = EchoPet.getPluginInstance().getSqlCon();
+		if (EchoPet.getInstance().options.useSql()) {
+			Connection con = EchoPet.getInstance().getSqlCon();
 
 			if (con != null) {
 				try {
@@ -39,27 +37,6 @@ public class SQLPetHandler {
 					}
 
 					/*for (PetData pd : list) {
-=======
-    public static SQLPetHandler getInstance() {
-        return EchoPet.getInstance().SPH;
-    }
-
-    public void updateDatabase(Player player, ArrayList<PetData> list, Boolean result, boolean isMount) {
-        if (EchoPet.getInstance().options.useSql()) {
-            Connection con = EchoPet.getInstance().getSqlCon();
-
-            if (con != null) {
-                try {
-                    String data = SQLUtil.serialiseUpdate(list, result, isMount);
-                    if (!data.equalsIgnoreCase("")) {
-                        PreparedStatement ps = con.prepareStatement("UPDATE Pets SET ? WHERE OwnerName = ?;");
-                        ps.setString(1, data);
-                        ps.setString(2, player.getName());
-                        ps.executeUpdate();
-                    }
-
-				/*for (PetData pd : list) {
->>>>>>> upstream/master
                     PreparedStatement ps4 = con.prepareStatement("INSERT INTO Pets (OwnerName, " + s + "" + pd.toString() + ") VALUES (?, ?);");
 					ps4.setString(1, player.getName());
 					ps4.setString(2, b.toString());
@@ -79,18 +56,10 @@ public class SQLPetHandler {
 		}
 	}
 
-<<<<<<< HEAD
 	public void saveToDatabase(LivingPet p, boolean isMount) {
-		if (EchoPet.getPluginInstance().options.useSql()) {
-			Connection con = EchoPet.getPluginInstance().getSqlCon();
+		if (EchoPet.getInstance().options.useSql()) {
+			Connection con = EchoPet.getInstance().getSqlCon();
 			String mountPrefix = isMount ? "Mount" : "";
-=======
-    public void saveToDatabase(LivingPet p, boolean isMount) {
-        if (EchoPet.getInstance().options.useSql()) {
-            Connection con = EchoPet.getInstance().getSqlCon();
-            String mountPrefix = isMount ? "Mount" : "";
->>>>>>> upstream/master
-
 			if (con != null && p != null) {
 				try {
 					// Delete any existing info
@@ -132,63 +101,14 @@ public class SQLPetHandler {
 				} catch (SQLException e) {
 					EchoPet.getInstance().severe(e, "Failed to close connection to MySQL Database (" + p.getOwner().getName() + ")");
 				}*/
-<<<<<<< HEAD
 				}
 			}
-		}
-	}
-	
-	public boolean isBought(Player player, PetType type){
-		if (!EchoPet.getPluginInstance().options.useSql()) {
-			return false;
-		}
-		
-		Connection con = EchoPet.getPluginInstance().getSqlCon();
-		
-		try {
-			PreparedStatement statement = con.prepareStatement("SELECT * FROM Pets_Bought WHERE OwnerName = ?;");
-			
-			statement.setString(1, player.getName());
-			
-			ResultSet rs = statement.executeQuery();
-			
-			while (rs.next()) {
-				PetType tableType = findPetType(rs.getString("PetType"));
-				
-				if (tableType == type){
-					return true;
-				}
-			}
-		} catch (SQLException e){
-			e.printStackTrace();
-		}
-		
-		return false;
-	}
-
-	public void saveBoughtPetToDatabase(Player player, PetType type){
-		if (!EchoPet.getPluginInstance().options.useSql()) {
-			return;
-		}
-		
-		Connection con = EchoPet.getPluginInstance().getSqlCon();
-
-		try {
-			PreparedStatement statement = con.prepareStatement("INSERT INTO Pets_Bought (OwnerName, PetType) VALUES (?, ?)");
-
-			statement.setString(1, player.getName());
-
-			statement.setString(2, type.toString());
-
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 	}
 
 	public LivingPet createPetFromDatabase(Player p) {
-		if (EchoPet.getPluginInstance().options.useSql()) {
-			Connection con = EchoPet.getPluginInstance().getSqlCon();
+		if (EchoPet.getInstance().options.useSql()) {
+			Connection con = EchoPet.getInstance().getSqlCon();
 
 			LivingPet pet = null;
 			Player owner;
@@ -266,98 +186,11 @@ public class SQLPetHandler {
 				} finally {
 					// Close the connection
 					/*try {
-=======
-                }
-            }
-        }
-    }
-
-    public LivingPet createPetFromDatabase(Player p) {
-        if (EchoPet.getInstance().options.useSql()) {
-            Connection con = EchoPet.getInstance().getSqlCon();
-
-            LivingPet pet = null;
-            Player owner;
-            PetType pt;
-            String name;
-            HashMap<PetData, Boolean> map = new HashMap<PetData, Boolean>();
-
-            if (con != null) {
-                try {
-                    PreparedStatement ps = con.prepareStatement("SELECT * FROM Pets WHERE OwnerName = ?;");
-                    ps.setString(1, p.getName());
-                    ResultSet rs = ps.executeQuery();
-                    while (rs.next()) {
-                        owner = Bukkit.getPlayerExact(rs.getString("OwnerName"));
-                        pt = findPetType(rs.getString("PetType"));
-                        if (pt == null) {
-                            return null;
-                        }
-                        name = rs.getString("PetName").replace("\'", "'");
-
-                        for (PetData pd : PetData.values()) {
-                            if (rs.getString(pd.toString()) != null) {
-                                map.put(pd, Boolean.valueOf(rs.getString(pd.toString())));
-                            }
-                        }
-
-                        if (owner == null) {
-                            return null;
-                        }
-
-                        PetHandler ph = PetHandler.getInstance();
-                        pet = ph.createPet(owner, pt, false);
-                        if (pet == null) {
-                            return null;
-                        }
-                        pet.setName(name);
-                        PetData[] PDT = createArray(map, true);
-                        PetData[] PDF = createArray(map, false);
-                        if (PDT != null) {
-                            PetHandler.getInstance().setData(pet, PDT, true);
-                        }
-                        if (PDF != null) {
-                            PetHandler.getInstance().setData(pet, PDF, false);
-                        }
-
-                        if (rs.getString("MountPetType") != null) {
-                            PetType mt = findPetType(rs.getString("MountPetType"));
-                            if (mt == null) {
-                                return null;
-                            }
-                            String mName = rs.getString("MountPetName").replace("\'", "'");
-                            for (PetData pd : PetData.values()) {
-                                if (rs.getString("Mount" + pd.toString()) != null) {
-                                    map.put(pd, Boolean.valueOf(rs.getString("Mount" + pd.toString())));
-                                }
-                            }
-
-                            LivingPet mount = pet.createMount(mt, false);
-                            if (mount != null) {
-                                mount.setName(mName);
-                                PetData[] MDT = createArray(map, true);
-                                PetData[] MDF = createArray(map, false);
-
-                                if (MDT != null) {
-                                    ph.setData(mount, MDT, true);
-                                }
-                                if (MDF != null) {
-                                    ph.setData(mount, MDF, false);
-                                }
-                            }
-                        }
-                    }
-                } catch (SQLException e) {
-                    Logger.log(Logger.LogLevel.SEVERE, "Failed to retrieve Pet data for " + p.getName() + " in MySQL Database", e, true);
-                } finally {
-                    // Close the connection
-				/*try {
 >>>>>>> upstream/master
 					con.close();
 				} catch (SQLException e) {
 					EchoPet.getInstance().severe(e, "Failed to close connection to MySQL Database (" + p.getName() + ")");
 				}*/
-<<<<<<< HEAD
 				}
 			}
 
@@ -390,8 +223,8 @@ public class SQLPetHandler {
 	}
 
 	public void clearFromDatabase(String name) {
-		if (EchoPet.getPluginInstance().options.useSql()) {
-			Connection con = EchoPet.getPluginInstance().getSqlCon();
+		if (EchoPet.getInstance().options.useSql()) {
+			Connection con = EchoPet.getInstance().getSqlCon();
 
 			if (con != null) {
 				try {
@@ -403,66 +236,19 @@ public class SQLPetHandler {
 				} finally {
 					// Close the connection
 					/*try {
-=======
-                }
-            }
-
-
-            return pet;
-        }
-        return null;
-    }
-
-    private PetData[] createArray(HashMap<PetData, Boolean> map, boolean b) {
-        ArrayList<PetData> list = new ArrayList<PetData>();
-        for (PetData pd : map.keySet()) {
-            if (map.get(pd) == b) {
-                list.add(pd);
-            }
-        }
-        return list.isEmpty() ? null : list.toArray(new PetData[list.size()]);
-    }
-
-    private PetType findPetType(String s) {
-        try {
-            return PetType.valueOf(s.toUpperCase());
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public void clearFromDatabase(Player p) {
-        clearFromDatabase(p.getName());
-    }
-
-    public void clearFromDatabase(String name) {
-        if (EchoPet.getInstance().options.useSql()) {
-            Connection con = EchoPet.getInstance().getSqlCon();
-
-            if (con != null) {
-                try {
-                    PreparedStatement ps1 = con.prepareStatement("DELETE FROM Pets WHERE OwnerName = ?;");
-                    ps1.setString(1, name);
-                    ps1.executeUpdate();
-                } catch (SQLException e) {
-                    Logger.log(Logger.LogLevel.SEVERE, "Failed to retrieve Pet data for " + name + " in MySQL Database", e, true);
-                } finally {
-                    // Close the connection
-				/*try {
 >>>>>>> upstream/master
 					con.close();
 				} catch (SQLException e) {
 					EchoPet.getInstance().severe(e, "Failed to close connection to MySQL Database (" + p.getName() + ")");
 				}*/
-<<<<<<< HEAD
 				}
 			}
 		}
 	}
 
 	public void clearMountFromDatabase(String name) {
-		if (EchoPet.getPluginInstance().options.useSql()) {
-			Connection con = EchoPet.getPluginInstance().getSqlCon();
+		if (EchoPet.getInstance().options.useSql()) {
+			Connection con = EchoPet.getInstance().getSqlCon();
 
 			if (con != null) {
 				try {
@@ -480,32 +266,6 @@ public class SQLPetHandler {
 				} finally {
 					// Close the connection
 					/*try {
-=======
-                }
-            }
-        }
-    }
-
-    public void clearMountFromDatabase(String name) {
-        if (EchoPet.getInstance().options.useSql()) {
-            Connection con = EchoPet.getInstance().getSqlCon();
-
-            if (con != null) {
-                try {
-                    ArrayList<PetData> arrayList = new ArrayList<PetData>();
-                    for (PetData pd : PetData.values()) {
-                        arrayList.add(pd);
-                    }
-                    String list = SQLUtil.serialiseUpdate(arrayList, null, true);
-                    PreparedStatement ps = con.prepareStatement("UPDATE Pets SET ? WHERE OwnerName = ?;");
-                    ps.setString(1, list);
-                    ps.setString(2, name);
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    Logger.log(Logger.LogLevel.SEVERE, "Failed to retrieve Pet data for " + name + " in MySQL Database", e, true);
-                } finally {
-                    // Close the connection
-				/*try {
 >>>>>>> upstream/master
 					con.close();
 				} catch (SQLException e) {
@@ -513,6 +273,58 @@ public class SQLPetHandler {
 				}*/
 				}
 			}
+		}
+	}
+
+	public boolean isBought(Player player, PetType type){
+		EchoPet ec = EchoPet.getInstance();
+
+		if (!ec.options.useSql()) {
+			return false;
+		}
+
+		Connection con = ec.getSqlCon();
+
+		try {
+			PreparedStatement statement = con.prepareStatement("SELECT * FROM Pets_Bought WHERE OwnerName = ?;");
+
+			statement.setString(1, player.getName());
+
+			ResultSet rs = statement.executeQuery();
+
+			while (rs.next()) {
+				PetType tableType = findPetType(rs.getString("PetType"));
+
+				if (tableType == type){
+					return true;
+				}
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	public void saveBoughtPetToDatabase(Player player, PetType type){
+		EchoPet ec = EchoPet.getInstance();
+
+		if (!ec.options.useSql()) {
+			return;
+		}
+
+		Connection con = ec.getSqlCon();
+
+		try {
+			PreparedStatement statement = con.prepareStatement("INSERT INTO Pets_Bought (OwnerName, PetType) VALUES (?, ?)");
+
+			statement.setString(1, player.getName());
+
+			statement.setString(2, type.toString());
+
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 }

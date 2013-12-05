@@ -153,6 +153,13 @@ public class EchoPet extends JavaPlugin {
 				} catch (SQLException e) {
 					Logger.log(Logger.LogLevel.SEVERE, "`Pets` Table generation failed [MySQL DataBase: " + db + "].", e, true);
 				}
+
+				try {
+					con.prepareStatement("CREATE TABLE IF NOT EXISTS Pets_Bought (OwnerName varchar(255), PetType varchar(255));").executeUpdate();
+				}catch (SQLException e){
+					Logger.log(Logger.LogLevel.SEVERE, "Pets Bought Table generation failed [MySQL DataBase: " + db + "].", e, true);
+				}
+
 				this.sqlRefresh = new SQLRefresh(getMainConfig().getInt("sql.timeout") * 20 * 60);
 			}
 		}
@@ -165,6 +172,18 @@ public class EchoPet extends JavaPlugin {
 		// Check whether to start AutoSave
 		if (getMainConfig().getBoolean("autoSave")) {
 			AS = new AutoSave(getMainConfig().getInt("autoSaveTimer"));
+		}
+
+		Plugin vault = getServer().getPluginManager().getPlugin("Vault");
+
+		if (vault != null){
+			RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+
+			if (economyProvider == null){
+				economy = null;
+			}else {
+				economy = economyProvider.getProvider();
+			}
 		}
 
 		// Register custom commands
@@ -250,6 +269,8 @@ public class EchoPet extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		PH.removeAllPets();
+
+		getServer().getScheduler().cancelTasks(this);
 	}
 
 	@Override

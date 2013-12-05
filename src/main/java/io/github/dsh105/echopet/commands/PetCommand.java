@@ -10,12 +10,8 @@ import io.github.dsh105.echopet.menu.main.MenuOption;
 import io.github.dsh105.echopet.menu.main.PetMenu;
 import io.github.dsh105.echopet.menu.selector.PetSelector;
 import io.github.dsh105.echopet.menu.selector.SelectorItem;
-<<<<<<< HEAD
 import io.github.dsh105.echopet.mysql.SQLPetHandler;
-import io.github.dsh105.echopet.permissions.Perm;
-=======
 import io.github.dsh105.echopet.util.permissions.Perm;
->>>>>>> upstream/master
 import io.github.dsh105.echopet.util.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
