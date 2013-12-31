@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import io.github.dsh105.echopet.EchoPet;
-import io.github.dsh105.echopet.entity.living.data.PetType;
+import io.github.dsh105.echopet.entity.PetType;
 import io.github.dsh105.echopet.mysql.SQLPetHandler;
 import io.github.dsh105.echopet.util.PetUtil;
 

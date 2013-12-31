@@ -1,8 +1,9 @@
 package io.github.dsh105.echopet.entity.living.type.human;
 
 import io.github.dsh105.echopet.entity.living.LivingPet;
-import io.github.dsh105.echopet.entity.living.data.PetType;
+import io.github.dsh105.echopet.entity.PetType;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -30,6 +31,14 @@ public class HumanPet extends LivingPet {
             human.profile = new GameProfile(human.profile.getId(), s);
         }
         if (human.init) {
+            ((EntityHumanPet) this.getEntityPet()).updatePacket();
+        }
+    }
+
+    @Override
+    public void teleport(Location to) {
+        super.teleport(to);
+        if (((EntityHumanPet) this.getEntityPet()).hasInititiated()) {
             ((EntityHumanPet) this.getEntityPet()).updatePacket();
         }
     }

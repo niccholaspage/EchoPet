@@ -1,7 +1,7 @@
 package io.github.dsh105.echopet.entity.living.type.ocelot;
 
 
-import io.github.dsh105.echopet.entity.living.data.PetType;
+import io.github.dsh105.echopet.entity.PetType;
 import io.github.dsh105.echopet.entity.living.IAgeablePet;
 import io.github.dsh105.echopet.entity.living.LivingPet;
 import org.bukkit.entity.Ocelot.Type;
@@ -31,9 +31,11 @@ public class OcelotPet extends LivingPet implements IAgeablePet {
 
     public void setCatType(Type t) {
         setCatType(t.getId());
+        this.type = t;
     }
 
     public void setCatType(int i) {
         ((EntityOcelotPet) getEntityPet()).setCatType(i);
+        this.type = Type.getType(i);
     }
 }

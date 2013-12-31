@@ -1,7 +1,7 @@
 package io.github.dsh105.echopet.menu.selector;
 
 import io.github.dsh105.echopet.EchoPet;
-import io.github.dsh105.echopet.api.event.PetSelectMenuOpenEvent;
+import io.github.dsh105.echopet.api.event.PetMenuOpenEvent;
 import io.github.dsh105.echopet.menu.Menu;
 import io.github.dsh105.echopet.util.Lang;
 import org.bukkit.Bukkit;
@@ -52,7 +52,7 @@ public class PetSelector implements Menu {
     }
 
     public void open(boolean sendMessage) {
-        PetSelectMenuOpenEvent menuEvent = new PetSelectMenuOpenEvent(this.viewer);
+        PetMenuOpenEvent menuEvent = new PetMenuOpenEvent(this.viewer, PetMenuOpenEvent.MenuType.SELECTOR);
         EchoPet.getInstance().getServer().getPluginManager().callEvent(menuEvent);
         if (menuEvent.isCancelled()) {
             return;

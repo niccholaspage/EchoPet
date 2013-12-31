@@ -1,11 +1,10 @@
 package io.github.dsh105.echopet.entity.living.type.human;
 
+import io.github.dsh105.dshutils.util.ReflectionUtil;
 import io.github.dsh105.echopet.entity.living.EntityLivingPet;
 import io.github.dsh105.echopet.entity.living.LivingPet;
 import io.github.dsh105.echopet.entity.living.SizeCategory;
-import io.github.dsh105.echopet.logger.ConsoleLogger;
-import io.github.dsh105.echopet.logger.Logger;
-import io.github.dsh105.echopet.util.ReflectionUtil;
+import io.github.dsh105.dshutils.logger.Logger;
 import net.minecraft.server.v1_7_R1.*;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import org.bukkit.Location;
@@ -43,7 +42,7 @@ public class EntityHumanPet extends EntityLivingPet {
     }
 
     private void createPacket() {
-        this.profile = new GameProfile(this.id + "", this.pet.getPetName());
+        this.profile = new GameProfile(this.id + "", this.pet.getName());
         try {
             ReflectionUtil.setValue(this.packet, "a", this.id);
             ReflectionUtil.setValue(this.packet, "b", this.profile);
@@ -63,7 +62,7 @@ public class EntityHumanPet extends EntityLivingPet {
         this.dw.watch(0, (Object) (byte) this.b0/*(this.isInvisible() ? 32 : this.isSneaking() ? 2 : this.isSprinting() ? 8 : 0)*/);
         this.dw.watch(1, (Object) (short) 0);
         this.dw.watch(8, (Object) (byte) 0);
-        this.dw.watch(10, (Object) (String) this.pet.getPetName());
+        this.dw.watch(10, (Object) (String) this.pet.getName());
         try {
             this.metaPacket = new PacketPlayOutEntityMetadata(this.id, this.dw, true);
             ReflectionUtil.sendPacket(new Location(this.world.getWorld(), this.locX, this.locY, this.locZ), this.metaPacket);
@@ -72,13 +71,17 @@ public class EntityHumanPet extends EntityLivingPet {
         }
     }
 
-    protected void updatePacket() {
+    public void updatePacket() {
         this.createPacket();
         try {
             ReflectionUtil.sendPacket(new Location(this.world.getWorld(), this.locX, this.locY, this.locZ), this.packet);
         } catch (Exception e) {
             Logger.log(Logger.LogLevel.SEVERE, "Failed to create Metadata Packet for Human Pet.", e, true);
         }
+    }
+
+    public boolean hasInititiated() {
+        return this.init;
     }
 
     private void init() {

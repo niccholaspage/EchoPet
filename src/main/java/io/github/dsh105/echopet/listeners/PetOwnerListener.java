@@ -1,15 +1,19 @@
 package io.github.dsh105.echopet.listeners;
 
+import io.github.dsh105.dshutils.util.GeometryUtil;
 import io.github.dsh105.echopet.EchoPet;
 import io.github.dsh105.echopet.api.event.PetInteractEvent;
 import io.github.dsh105.echopet.data.PetHandler;
+import io.github.dsh105.echopet.entity.Pet;
 import io.github.dsh105.echopet.entity.living.CraftLivingPet;
 import io.github.dsh105.echopet.entity.living.LivingPet;
+import io.github.dsh105.echopet.entity.living.type.human.EntityHumanPet;
+import io.github.dsh105.echopet.entity.living.type.human.HumanPet;
 import io.github.dsh105.echopet.menu.selector.PetSelector;
 import io.github.dsh105.echopet.menu.selector.SelectorItem;
 import io.github.dsh105.echopet.mysql.SQLPetHandler;
 import io.github.dsh105.echopet.util.Lang;
-import io.github.dsh105.echopet.util.StringUtil;
+import io.github.dsh105.dshutils.util.StringUtil;
 import io.github.dsh105.echopet.util.WorldUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_7_R1.entity.CraftPlayer;
@@ -23,6 +27,8 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Iterator;
 
 public class PetOwnerListener implements Listener {
 
@@ -57,7 +63,7 @@ public class PetOwnerListener implements Listener {
         if (event.getEntity() instanceof Player) {
             Player p = (Player) event.getEntity();
             if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                LivingPet pet = PetHandler.getInstance().getPet(p);
+                Pet pet = PetHandler.getInstance().getPet(p);
                 if (pet != null && pet.isOwnerRiding()) {
                     event.setCancelled(true);
                 }
@@ -68,7 +74,16 @@ public class PetOwnerListener implements Listener {
     @EventHandler
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         final Player p = event.getPlayer();
-        final LivingPet pi = PetHandler.getInstance().getPet(p);
+        final Pet pi = PetHandler.getInstance().getPet(p);
+        Iterator<Pet> i = PetHandler.getInstance().getPets().iterator();
+        while (i.hasNext()) {
+            Pet pet = i.next();
+            if (pet instanceof HumanPet && ((EntityHumanPet) pet.getEntityPet()).hasInititiated()) {
+                if (GeometryUtil.getNearbyEntities(event.getTo(), 50).contains(pet)) {
+                    ((EntityHumanPet) pet.getEntityPet()).updatePacket();
+                }
+            }
+        }
         if (pi != null) {
             if (pi.ownerIsMounting) return;
             if (event.getFrom().getWorld() == event.getTo().getWorld()) {
@@ -111,7 +126,7 @@ public class PetOwnerListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player p = event.getPlayer();
-        LivingPet pi = PetHandler.getInstance().getPet(p);
+        Pet pi = PetHandler.getInstance().getPet(p);
         if (pi != null) {
             //ec.PH.saveFileData("autosave", pi);
             PetHandler.getInstance().saveFileData("autosave", pi);
@@ -154,6 +169,8 @@ public class PetOwnerListener implements Listener {
                 inv.setItem(slot, selector);
             }
         }
+
+
         final boolean sendMessage = ((Boolean) ec.options.getConfigOption("sendLoadMessage", true));
 
         new BukkitRunnable() {
@@ -163,12 +180,22 @@ public class PetOwnerListener implements Listener {
             }
 
         }.runTaskLater(ec, 20);
+
+        Iterator<Pet> i = PetHandler.getInstance().getPets().iterator();
+        while (i.hasNext()) {
+            Pet pet = i.next();
+            if (pet instanceof HumanPet && ((EntityHumanPet) pet.getEntityPet()).hasInititiated()) {
+                if (GeometryUtil.getNearbyEntities(event.getPlayer().getLocation(), 50).contains(pet)) {
+                    ((EntityHumanPet) pet.getEntityPet()).updatePacket();
+                }
+            }
+        }
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player p = event.getEntity();
-        LivingPet pet = PetHandler.getInstance().getPet(p);
+        Pet pet = PetHandler.getInstance().getPet(p);
         if (pet != null) {
             PetHandler.getInstance().saveFileData("autosave", pet);
             SQLPetHandler.getInstance().saveToDatabase(pet, false);

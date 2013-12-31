@@ -1,10 +1,12 @@
 package io.github.dsh105.echopet.data;
 
+import io.github.dsh105.dshutils.logger.ConsoleLogger;
+import io.github.dsh105.dshutils.util.EnumUtil;
 import io.github.dsh105.echopet.EchoPet;
-import io.github.dsh105.echopet.entity.living.data.PetData;
-import io.github.dsh105.echopet.entity.living.data.PetType;
+import io.github.dsh105.echopet.entity.Pet;
+import io.github.dsh105.echopet.entity.living.PetData;
+import io.github.dsh105.echopet.entity.PetType;
 import io.github.dsh105.echopet.entity.living.IAgeablePet;
-import io.github.dsh105.echopet.entity.living.LivingPet;
 import io.github.dsh105.echopet.entity.living.type.blaze.BlazePet;
 import io.github.dsh105.echopet.entity.living.type.creeper.CreeperPet;
 import io.github.dsh105.echopet.entity.living.type.enderman.EndermanPet;
@@ -20,10 +22,10 @@ import io.github.dsh105.echopet.entity.living.type.villager.VillagerPet;
 import io.github.dsh105.echopet.entity.living.type.wither.WitherPet;
 import io.github.dsh105.echopet.entity.living.type.wolf.WolfPet;
 import io.github.dsh105.echopet.entity.living.type.zombie.ZombiePet;
-import io.github.dsh105.echopet.logger.Logger;
-import io.github.dsh105.echopet.util.EnumUtil;
+import io.github.dsh105.dshutils.logger.Logger;
 import io.github.dsh105.echopet.util.Lang;
-import io.github.dsh105.echopet.util.StringUtil;
+import io.github.dsh105.echopet.util.PetUtil;
+import io.github.dsh105.dshutils.util.StringUtil;
 import io.github.dsh105.echopet.util.WorldUtil;
 import org.bukkit.DyeColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -40,7 +42,7 @@ public class PetHandler {
 
     private static EchoPet ec;
 
-    private ArrayList<LivingPet> pets = new ArrayList<LivingPet>();
+    private ArrayList<Pet> pets = new ArrayList<Pet>();
 
     public PetHandler(EchoPet ec) {
         PetHandler.ec = ec;
@@ -50,40 +52,40 @@ public class PetHandler {
         return ec.PH;
     }
 
-    public ArrayList<LivingPet> getPets() {
+    public ArrayList<Pet> getPets() {
         return pets;
     }
 
-    public LivingPet loadPets(Player p, boolean findDefault, boolean sendMessage, boolean checkWorldOverride) {
+    public Pet loadPets(Player p, boolean findDefault, boolean sendMessage, boolean checkWorldOverride) {
         EchoPet ec = EchoPet.getInstance();
         if (ec.options.sqlOverride()) {
-            LivingPet pet = ec.SPH.createPetFromDatabase(p);
+            Pet pet = ec.SPH.createPetFromDatabase(p);
             if (pet == null) {
                 return null;
             } else {
                 if (sendMessage) {
-                    Lang.sendTo(p, Lang.DATABASE_PET_LOAD.toString().replace("%petname%", pet.getPetName().toString()));
+                    Lang.sendTo(p, Lang.DATABASE_PET_LOAD.toString().replace("%petname%", pet.getName().toString()));
                 }
             }
             return pet;
         } else if (ec.getPetConfig().get("default." + p.getName() + ".pet.type") != null && findDefault) {
-            LivingPet pi = ec.PH.createPetFromFile("default", p);
+            Pet pi = ec.PH.createPetFromFile("default", p);
             if (pi == null) {
                 return null;
             } else {
                 if (sendMessage) {
-                    Lang.sendTo(p, Lang.DEFAULT_PET_LOAD.toString().replace("%petname%", pi.getPetName().toString()));
+                    Lang.sendTo(p, Lang.DEFAULT_PET_LOAD.toString().replace("%petname%", pi.getName().toString()));
                 }
             }
             return pi;
         } else if ((checkWorldOverride && (Boolean) ec.options.getConfigOption("multiworldLoadOverride", true)) || (Boolean) ec.options.getConfigOption("loadSavedPets", true)) {
             if (ec.getPetConfig().get("autosave." + p.getName() + ".pet.type") != null) {
-                LivingPet pi = ec.PH.createPetFromFile("autosave", p);
+                Pet pi = ec.PH.createPetFromFile("autosave", p);
                 if (pi == null) {
                     return null;
                 } else {
                     if (sendMessage) {
-                        Lang.sendTo(p, Lang.AUTOSAVE_PET_LOAD.toString().replace("%petname%", pi.getPetName().toString()));
+                        Lang.sendTo(p, Lang.AUTOSAVE_PET_LOAD.toString().replace("%petname%", pi.getName().toString()));
                     }
                 }
                 return pi;
@@ -93,9 +95,9 @@ public class PetHandler {
     }
 
     public void removeAllPets() {
-        Iterator<LivingPet> i = pets.listIterator();
+        Iterator<Pet> i = pets.listIterator();
         while (i.hasNext()) {
-            LivingPet p = i.next();
+            Pet p = i.next();
             saveFileData("autosave", p);
             ec.SPH.saveToDatabase(p, false);
             p.removePet(true);
@@ -103,7 +105,7 @@ public class PetHandler {
         }
     }
 
-    public LivingPet createPet(Player owner, PetType petType, boolean sendMessageOnFail) {
+    public Pet createPet(Player owner, PetType petType, boolean sendMessageOnFail) {
         removePets(owner, true);
         if (!WorldUtil.allowPets(owner.getLocation())) {
             if (sendMessageOnFail) {
@@ -117,7 +119,7 @@ public class PetHandler {
             }
             return null;
         }
-        LivingPet pi = petType.getNewPetInstance(owner, petType);
+        Pet pi = petType.getNewPetInstance(owner, petType);
         //Pet pi = new Pet(owner, petType);
         forceAllValidData(pi);
         pets.add(pi);
@@ -126,7 +128,7 @@ public class PetHandler {
         return pi;
     }
 
-    public LivingPet createPet(Player owner, PetType petType, PetType mountType, boolean sendFailMessage) {
+    public Pet createPet(Player owner, PetType petType, PetType mountType, boolean sendFailMessage) {
         removePets(owner, true);
         if (!WorldUtil.allowPets(owner.getLocation())) {
             if (sendFailMessage) {
@@ -140,7 +142,7 @@ public class PetHandler {
             }
             return null;
         }
-        LivingPet pi = petType.getNewPetInstance(owner, petType);
+        Pet pi = petType.getNewPetInstance(owner, petType);
         //Pet pi = new Pet(owner, petType);
         pi.createMount(mountType, true);
         forceAllValidData(pi);
@@ -150,8 +152,8 @@ public class PetHandler {
         return pi;
     }
 
-    public LivingPet getPet(Player player) {
-        for (LivingPet pi : pets) {
+    public Pet getPet(Player player) {
+        for (Pet pi : pets) {
             if (pi.getOwner().getName().equals(player.getName())) {
                 return pi;
             }
@@ -159,8 +161,8 @@ public class PetHandler {
         return null;
     }
 
-    public LivingPet getPet(Entity pet) {
-        for (LivingPet pi : pets) {
+    public Pet getPet(Entity pet) {
+        for (Pet pi : pets) {
             if (pi.getEntityPet().equals(pet) || pi.getMount().getEntityPet().equals(pet)) {
                 return pi;
             }
@@ -187,7 +189,7 @@ public class PetHandler {
 	}*/
 
     // Force all data specified in config file and notify player.
-    public void forceAllValidData(LivingPet pi) {
+    public void forceAllValidData(Pet pi) {
         ArrayList<PetData> tempData = new ArrayList<PetData>();
         for (PetData data : PetData.values()) {
             if (ec.options.forceData(pi.getPetType(), data)) {
@@ -209,9 +211,9 @@ public class PetHandler {
         if ((Boolean) ec.options.getConfigOption("sendForceMessage", true)) {
             String dataToString = " ";
             if (!tempMountData.isEmpty()) {
-                dataToString = StringUtil.dataToString(tempData);
+                dataToString = PetUtil.dataToString(tempData);
             } else {
-                dataToString = StringUtil.dataToString(tempData, tempMountData);
+                dataToString = PetUtil.dataToString(tempData, tempMountData);
             }
             if (dataToString != " ") {
                 Lang.sendTo(pi.getOwner(), Lang.DATA_FORCE_MESSAGE.toString().replace("%data%", dataToString));
@@ -219,7 +221,7 @@ public class PetHandler {
         }
     }
 
-    public void updateFileData(String type, LivingPet pet, ArrayList<PetData> list, boolean b) {
+    public void updateFileData(String type, Pet pet, ArrayList<PetData> list, boolean b) {
         ec.SPH.updateDatabase(pet.getOwner(), list, b, pet.isMount());
         String w = pet.getOwner().getWorld().getName();
         String path = type + "." + w + "." + pet.getOwner().getName();
@@ -229,7 +231,7 @@ public class PetHandler {
         ec.getPetConfig().saveConfig();
     }
 
-    public LivingPet createPetFromFile(String type, Player p) {
+    public Pet createPetFromFile(String type, Player p) {
         if ((Boolean) ec.options.getConfigOption("loadSavedPets", true)) {
             String path = type + "." + p.getName();
             if (ec.getPetConfig().get(path) != null) {
@@ -242,7 +244,7 @@ public class PetHandler {
                 if (!ec.options.allowPetType(petType)) {
                     return null;
                 }
-                LivingPet pi = this.createPet(p, petType, true);
+                Pet pi = this.createPet(p, petType, true);
                 if (pi == null) {
                     return null;
                 }
@@ -276,7 +278,7 @@ public class PetHandler {
                     }
                     if (mountPetType == null) return null;
                     if (ec.options.allowMounts(petType)) {
-                        LivingPet mount = pi.createMount(mountPetType, true);
+                        Pet mount = pi.createMount(mountPetType, true);
                         if (mount != null) {
                             mount.setName(mountName);
                             ArrayList<PetData> mountData = new ArrayList<PetData>();
@@ -306,9 +308,9 @@ public class PetHandler {
     }
 
     public void removePets(Player player, boolean makeDeathSound) {
-        Iterator<LivingPet> i = pets.listIterator();
+        Iterator<Pet> i = pets.listIterator();
         while (i.hasNext()) {
-            LivingPet p = i.next();
+            Pet p = i.next();
             if (p.getOwner().getName().equals(player.getName())) {
 				/*saveFileData("autosave", p);
 				ec.SPH.saveToDatabase(p, false);*/
@@ -318,14 +320,14 @@ public class PetHandler {
         }
     }
 
-    public void removePet(LivingPet pi, boolean makeDeathSound) {
+    public void removePet(Pet pi, boolean makeDeathSound) {
         //saveFileData("autosave", pi);
 		/*pi.removePet();
 		pets.remove(pi);*/
         removePets(pi.getOwner(), makeDeathSound);
     }
 
-    public void saveFileData(String type, LivingPet pi) {
+    public void saveFileData(String type, Pet pi) {
         clearFileData(type, pi);
         try {
             String oName = pi.getOwner().getName();
@@ -333,9 +335,9 @@ public class PetHandler {
             PetType petType = pi.getPetType();
 
             ec.getPetConfig().set(path + ".pet.type", petType.toString());
-            ec.getPetConfig().set(path + ".pet.name", pi.getNameToString());
+            ec.getPetConfig().set(path + ".pet.name", pi.getNameWithoutColours());
 
-            for (PetData pd : pi.getActiveData()) {
+            for (PetData pd : pi.getPetData()) {
                 ec.getPetConfig().set(path + ".pet.data." + pd.toString().toLowerCase(), true);
             }
 
@@ -343,8 +345,8 @@ public class PetHandler {
                 PetType mountType = pi.getMount().getPetType();
 
                 ec.getPetConfig().set(path + ".mount.type", mountType.toString());
-                ec.getPetConfig().set(path + ".mount.name", pi.getMount().getNameToString());
-                for (PetData pd : pi.getMount().getActiveData()) {
+                ec.getPetConfig().set(path + ".mount.name", pi.getMount().getNameWithoutColours());
+                for (PetData pd : pi.getMount().getPetData()) {
                     ec.getPetConfig().set(path + ".mount.data." + pd.toString().toLowerCase(), true);
                 }
             }
@@ -427,7 +429,7 @@ public class PetHandler {
         ec.getPetConfig().saveConfig();
     }
 
-    public void clearFileData(String type, LivingPet pi) {
+    public void clearFileData(String type, Pet pi) {
         clearFileData(type, pi.getOwner());
     }
 
@@ -453,14 +455,14 @@ public class PetHandler {
         clearFileData(type, p.getName());
     }
 
-    public void setData(LivingPet pet, PetData[] data, boolean b) {
+    public void setData(Pet pet, PetData[] data, boolean b) {
         PetType petType = pet.getPetType();
         for (PetData pd : data) {
             setData(pet, pd, b);
         }
     }
 
-    public void setData(LivingPet pet, PetData pd, boolean b) {
+    public void setData(Pet pet, PetData pd, boolean b) {
         PetType petType = pet.getPetType();
         if (petType.isDataAllowed(pd)) {
             if (pd == PetData.BABY) {
@@ -642,7 +644,7 @@ public class PetHandler {
                     }
                 }
             }
-            ListIterator<PetData> i = pet.getActiveData().listIterator();
+            ListIterator<PetData> i = pet.getPetData().listIterator();
             while (i.hasNext()) {
                 PetData petData = i.next();
                 if (petData != pd) {
@@ -658,12 +660,12 @@ public class PetHandler {
             }
 
             if (b) {
-                if (!pet.getActiveData().contains(pd)) {
-                    pet.getActiveData().add(pd);
+                if (!pet.getPetData().contains(pd)) {
+                    pet.getPetData().add(pd);
                 }
             } else {
-                if (pet.getActiveData().contains(pd)) {
-                    pet.getActiveData().remove(pd);
+                if (pet.getPetData().contains(pd)) {
+                    pet.getPetData().remove(pd);
                 }
             }
         }

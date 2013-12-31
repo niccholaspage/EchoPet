@@ -1,6 +1,6 @@
 package io.github.dsh105.echopet.entity.living.type.sheep;
 
-import io.github.dsh105.echopet.entity.living.data.PetType;
+import io.github.dsh105.echopet.entity.PetType;
 import io.github.dsh105.echopet.entity.living.IAgeablePet;
 import io.github.dsh105.echopet.entity.living.LivingPet;
 import org.bukkit.DyeColor;
@@ -45,10 +45,12 @@ public class SheepPet extends LivingPet implements IAgeablePet {
 
     public void setColor(DyeColor c) {
         ((EntitySheepPet) getEntityPet()).setColor(c.getWoolData());
+        this.color = c.getWoolData();
     }
 
     public void setColor(byte b) {
         ((EntitySheepPet) getEntityPet()).setColor(b);
+        this.color = b;
     }
 
 }

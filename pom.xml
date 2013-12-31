@@ -4,17 +4,20 @@
     <groupId>io.github.dsh105</groupId>
     <artifactId>EchoPet</artifactId>
     <name>EchoPet</name>
-    <version>2.2.1</version>
+    <version>2.2.1-SNAPSHOT</version>
     <url>http://dev.bukkit.org/bukkit-plugins/echopet/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dshutils.version>1.0-SNAPSHOT</dshutils.version>
         <vnp.version>3.18.4-SNAPSHOT</vnp.version>
         <worldguard.version>5.8.1-SNAPSHOT</worldguard.version>
         <worldedit.version>5.5.8-SNAPSHOT</worldedit.version>
         <vault.version>1.2.27</vault.version>
         <minecraft.version>1.7.2</minecraft.version>
-        <craftbukkit.version>R0.1</craftbukkit.version>
+        <craftbukkit.version>R0.2</craftbukkit.version>
         <cb_package>v1_7_R1</cb_package>
+        <slf4j.version>1.7.5</slf4j.version>
+        <bonecp.version>0.8.0-rc3</bonecp.version>
         <main.class>io.github.dsh105.echopet.EchoPet</main.class>
     </properties>
     <distributionManagement>
@@ -35,6 +38,11 @@
             <artifactId>craftbukkit</artifactId>
             <version>${minecraft.version}-${craftbukkit.version}-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.dsh105</groupId>
+            <artifactId>DSHUtils</artifactId>
+            <version>${dshutils.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kitteh</groupId>
@@ -78,11 +86,25 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jolbox</groupId>
+            <artifactId>bonecp</artifactId>
+            <version>${bonecp.version}</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
             <id>bukkit-repo</id>
             <url>http://repo.bukkit.org/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>hawk-repo</id>
+            <url>http://ci.hawkfalcon.com/plugin/repository/everything/</url>
         </repository>
         <repository>
             <id>sk89q-repo</id>
@@ -135,6 +157,44 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.jolbox:bonecp</include>
+                                    <include>org.slf4j:slf4j-api</include>
+                                    <include>org.slf4j:slf4j-jdk14</include>
+                                    <include>io.github.dsh105:DSHUtils</include>
+                                </includes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.jolbox</pattern>
+                                    <shadedPattern>io.github.dsh105.echopet.libraries</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.slf4j</pattern>
+                                    <shadedPattern>io.github.dsh105.echopet.libraries.slf4j</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.github.dsh105.dshutils</pattern>
+                                    <shadedPattern>io.github.dsh105.echopet.libraries.dshutils</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

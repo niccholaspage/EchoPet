@@ -1,8 +1,9 @@
-package io.github.dsh105.echopet.config.options;
+package io.github.dsh105.echopet.config;
 
-import io.github.dsh105.echopet.config.YAMLConfig;
-import io.github.dsh105.echopet.entity.living.data.PetData;
-import io.github.dsh105.echopet.entity.living.data.PetType;
+import io.github.dsh105.dshutils.config.YAMLConfig;
+import io.github.dsh105.dshutils.config.options.Options;
+import io.github.dsh105.echopet.entity.living.PetData;
+import io.github.dsh105.echopet.entity.PetType;
 import org.bukkit.Bukkit;
 
 
@@ -13,7 +14,6 @@ public class ConfigOptions extends Options {
     public ConfigOptions(YAMLConfig config) {
         super(config);
         instance = this;
-        this.setDefaults();
     }
 
     public boolean allowPetType(PetType petType) {
@@ -95,7 +95,6 @@ public class ConfigOptions extends Options {
         set("checkForUpdates", true, "If -autoUpdate- is set to false, EchoPet will notify certain", "players of new updates if they are available (if set to true).");
 
         set("sql.overrideFile", true, "If true, Pets saved to a MySQL Database will override", "those saved to a file (Default and AutoSave Pets)");
-        set("sql.timeout", 30);
         set("sql.use", false);
         set("sql.host", "localhost");
         set("sql.port", 3306);
@@ -148,7 +147,7 @@ public class ConfigOptions extends Options {
             if (petType != PetType.ENDERDRAGON) {
                 boolean canFly = (petType == PetType.BAT || petType == PetType.BLAZE || petType == PetType.GHAST || petType == PetType.SQUID || petType == PetType.WITHER);
                 set("pets." + petType.toString().toLowerCase().replace("_", " ") + ".canFly", canFly);
-                set("pets." + petType.toString().toLowerCase().replace("_", " ") + ".allow.mounts", canFly);
+                set("pets." + petType.toString().toLowerCase().replace("_", " ") + ".allow.mounts", true);
             }
 
             for (PetData pd : PetData.values()) {
