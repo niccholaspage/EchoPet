@@ -12,17 +12,20 @@ import io.github.dsh105.dshutils.config.YAMLConfigManager;
 import io.github.dsh105.dshutils.logger.ConsoleLogger;
 import io.github.dsh105.dshutils.logger.Logger;
 import io.github.dsh105.dshutils.util.ReflectionUtil;
-import io.github.dsh105.echopet.api.EchoPetAPI;
 import io.github.dsh105.echopet.commands.CommandComplete;
 import io.github.dsh105.echopet.commands.PetAdminCommand;
 import io.github.dsh105.echopet.commands.PetCommand;
 import io.github.dsh105.echopet.config.ConfigOptions;
 import io.github.dsh105.echopet.data.AutoSave;
-import io.github.dsh105.echopet.entity.IEntityPet;
-import io.github.dsh105.echopet.entity.living.PetData;
 import io.github.dsh105.echopet.data.PetHandler;
+import io.github.dsh105.echopet.entity.EntityPet;
 import io.github.dsh105.echopet.entity.PetType;
-import io.github.dsh105.echopet.listeners.*;
+import io.github.dsh105.echopet.listeners.ChunkListener;
+import io.github.dsh105.echopet.listeners.MenuListener;
+import io.github.dsh105.echopet.listeners.PetEntityListener;
+import io.github.dsh105.echopet.listeners.PetOwnerListener;
+import io.github.dsh105.echopet.listeners.RegionListener;
+import io.github.dsh105.echopet.listeners.VanishListener;
 import io.github.dsh105.echopet.mysql.SQLPetHandler;
 import io.github.dsh105.echopet.util.Lang;
 import io.github.dsh105.echopet.util.SQLUtil;
@@ -33,11 +36,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
-import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import io.github.dsh105.echopet.entity.living.PetData;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,10 +49,13 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
 
-public class EchoPet extends JavaPlugin {
-    private static EchoPet plugin;
+public class EchoPetPlugin extends JavaPlugin {
+
+    private static EchoPetPlugin plugin;
     private static Random random = new Random();
 
     private YAMLConfigManager configManager;
@@ -61,8 +68,6 @@ public class EchoPet extends JavaPlugin {
     public SQLPetHandler SPH;
     public BoneCP dbPool;
     public String prefix = "" + ChatColor.DARK_RED + "[" + ChatColor.RED + "EchoPet" + ChatColor.DARK_RED + "] " + ChatColor.RESET;
-
-    private EchoPetAPI api;
 
     public String cmdString = "pet";
     public String adminCmdString = "petadmin";
@@ -112,8 +117,6 @@ public class EchoPet extends JavaPlugin {
 
             return;
         }
-
-        this.api = new EchoPetAPI();
 
         PluginManager manager = getServer().getPluginManager();
 
@@ -274,66 +277,6 @@ public class EchoPet extends JavaPlugin {
         manager.registerEvents(new PetOwnerListener(), this);
         manager.registerEvents(new ChunkListener(), this);
 
-        // Register perms. This could really be done a lot better...
-        String[] permissions = new String[] {"remove", "list", "info", "menu", "show", "hide", "call", "name", "select", "selector"};
-        HashMap<Permission, Boolean> perms = new HashMap<Permission, Boolean>();
-        String[] type = new String[] {"pet", "petadmin"};
-        for (int i = 0; i <= 1; i++) {
-            String s = type[i];
-            boolean admin = i == 1;
-            for (PetType pt : PetType.values()) {
-                Permission p0 = new Permission("echopet." + s + ".type." + pt.toString().toLowerCase());
-                perms.put(p0, admin);
-                p0.addParent("echopet." + s + ".type.*", true);
-
-                Permission p1 = new Permission("echopet." + s + ".ride." + pt.toString().toLowerCase());
-                perms.put(p1, admin);
-                p1.addParent("echopet." + s + ".ride.*", true);
-
-                Permission p2 = new Permission("echopet." + s + ".hat." + pt.toString().toLowerCase());
-                perms.put(p2, admin);
-                p2.addParent("echopet.pet." + s + ".ride.*", true);
-
-                Permission p3 = new Permission("echopet." + s + ".default.set.type." + pt.toString().toLowerCase());
-                perms.put(p3, admin);
-                p3.addParent("echopet." + s + ".default.set.type.*", true);
-
-                for (PetData data : PetData.values()) {
-                    if (pt.isDataAllowed(data)) {
-                        Permission child = new Permission("echopet." + s + ".type." + pt.toString().toLowerCase() + "." + data.getConfigOptionString().toLowerCase());
-                        child.addParent("echopet." + s + ".type." + pt.toString().toLowerCase() + ".*", true);
-                        perms.put(child, admin);
-                    }
-                }
-            }
-            Permission d0 = new Permission("echopet." + s + ".default.set.current");
-            d0.addParent("echopet." + s + ".default.*", true);
-            Permission d1 = new Permission("echopet." + s + ".default.remove");
-            perms.put(d0, admin);
-            d1.addParent("echopet." + s + ".default.*", true);
-            perms.put(d1, admin);
-
-            for (String str : permissions) {
-                perms.put(new Permission("echopet." + s + "." + str), admin);
-            }
-        }
-        Permission p0 = new Permission("echopet.petadmin.reload");
-        perms.put(p0, true);
-        Permission p1 = new Permission("echopet.petadmin");
-        perms.put(p1, true);
-        Permission p2 = new Permission("echopet.pet");
-        perms.put(p2, false);
-        for (Map.Entry<Permission, Boolean> entry : perms.entrySet()) {
-            Permission p = entry.getKey();
-            p.addParent("echopet.*", true);
-            if (entry.getValue()) {
-                p.addParent("echopet.petadmin.*", true);
-            } else {
-                p.addParent("echopet.pet.*", true);
-            }
-            manager.addPermission(p);
-        }
-
         if (Hook.getVNP() != null) {
             manager.registerEvents(new VanishListener(), this);
         }
@@ -401,11 +344,26 @@ public class EchoPet extends JavaPlugin {
                 Lang.sendTo(sender, Lang.NO_PERMISSION.toString().replace("%perm%", "echopet.update"));
                 return true;
             }
+        } else if (commandLabel.equalsIgnoreCase("echopet")) {
+            if (sender.hasPermission("echopet.petadmin")) {
+                PluginDescriptionFile pdFile = this.getDescription();
+                sender.sendMessage(ChatColor.RED + "-------- EchoPet --------");
+                sender.sendMessage(ChatColor.GOLD + "Author: " + ChatColor.YELLOW + "DSH105");
+                sender.sendMessage(ChatColor.GOLD + "Version: " + ChatColor.YELLOW + pdFile.getVersion());
+                sender.sendMessage(ChatColor.GOLD + "Website: " + ChatColor.YELLOW + pdFile.getWebsite());
+                sender.sendMessage(ChatColor.GOLD + "Commands are registered at runtime to provide you with more dynamic control over the command labels.");
+                sender.sendMessage(ChatColor.GOLD + "" + ChatColor.UNDERLINE + "Command Registration:");
+                sender.sendMessage(ChatColor.GOLD + "Main: " + this.options.getCommandString());
+                sender.sendMessage(ChatColor.GOLD + "Admin: " + this.options.getCommandString() + "admin");
+            } else {
+                Lang.sendTo(sender, Lang.NO_PERMISSION.toString().replace("%perm%", "echopet.petadmin"));
+                return true;
+            }
         }
         return false;
     }
 
-    public void registerEntity(Class<? extends IEntityPet> clazz, String name, int id) {
+    public void registerEntity(Class<? extends EntityPet> clazz, String name, int id) {
         try {
             Field field_d = EntityTypes.class.getDeclaredField("d");
             Field field_f = EntityTypes.class.getDeclaredField("f");
@@ -433,17 +391,12 @@ public class EchoPet extends JavaPlugin {
 
             d.put(clazz, name);
             f.put(clazz, id);
-
         } catch (Exception e) {
             Logger.log(Logger.LogLevel.SEVERE, "Registration of Pet Entity [" + name + "] has failed. This Pet will not be available.", e, true);
         }
     }
 
-    public EchoPetAPI getAPI() {
-        return this.api;
-    }
-
-    public static EchoPet getInstance() {
+    public static EchoPetPlugin getInstance() {
         return plugin;
     }
 

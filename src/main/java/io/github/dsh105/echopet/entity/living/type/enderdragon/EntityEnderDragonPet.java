@@ -1,11 +1,11 @@
 package io.github.dsh105.echopet.entity.living.type.enderdragon;
 
-import io.github.dsh105.echopet.EchoPet;
+import io.github.dsh105.dshutils.logger.Logger;
+import io.github.dsh105.echopet.EchoPetPlugin;
 import io.github.dsh105.echopet.api.event.PetRideJumpEvent;
 import io.github.dsh105.echopet.entity.living.EntityNoClipPet;
 import io.github.dsh105.echopet.entity.living.LivingPet;
 import io.github.dsh105.echopet.entity.living.SizeCategory;
-import io.github.dsh105.dshutils.logger.Logger;
 import net.minecraft.server.v1_7_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_7_R1.entity.CraftPlayer;
@@ -78,9 +78,9 @@ public class EntityEnderDragonPet extends EntityNoClipPet implements IComplex, I
 
         if (this.passenger != null && (this.passenger instanceof EntityHuman)) {
             EntityHuman human = (EntityHuman) this.passenger;
-            if (human.getBukkitEntity() == this.getOwner().getPlayer()) {
+            if (human.getBukkitEntity() == this.getPlayerOwner().getPlayer()) {
                 /*this.lastYaw = this.yaw = this.passenger.yaw - 180.0F;
-				this.pitch = this.passenger.pitch * 0.5F;
+                this.pitch = this.passenger.pitch * 0.5F;
 				this.b(this.yaw, this.pitch);
 				this.aP = this.aN = this.yaw;*/
 
@@ -88,7 +88,7 @@ public class EntityEnderDragonPet extends EntityNoClipPet implements IComplex, I
                 float forw = ((EntityLiving) this.passenger).bf;
 
 				/*float sideMot = (float) Math.pow(side, side);
-				float forMot = (float) Math.pow(forw, forw);*/
+                float forMot = (float) Math.pow(forw, forw);*/
 
 				/*if (forMot <= 0.0F) {
 					forMot *= 0.25F;
@@ -132,7 +132,7 @@ public class EntityEnderDragonPet extends EntityNoClipPet implements IComplex, I
                     try {
                         if (this.jump.getBoolean(this.passenger)) {
                             PetRideJumpEvent rideEvent = new PetRideJumpEvent(this.getPet(), this.jumpHeight);
-                            EchoPet.getInstance().getServer().getPluginManager().callEvent(rideEvent);
+                            EchoPetPlugin.getInstance().getServer().getPluginManager().callEvent(rideEvent);
                             if (!rideEvent.isCancelled()) {
                                 v.setY(0.5F);
                             }
@@ -142,7 +142,7 @@ public class EntityEnderDragonPet extends EntityNoClipPet implements IComplex, I
                             }
                         }
                     } catch (Exception e) {
-                        Logger.log(Logger.LogLevel.WARNING, "Failed to initiate LivingPet Flying Motion for " + this.getOwner().getName() + "'s LivingPet.", e, true);
+                        Logger.log(Logger.LogLevel.WARNING, "Failed to initiate LivingPet Flying Motion for " + this.getPlayerOwner().getName() + "'s LivingPet.", e, true);
                     }
                 }
 
@@ -437,7 +437,7 @@ public class EntityEnderDragonPet extends EntityNoClipPet implements IComplex, I
         this.bz = false;
         if (this.random.nextInt(2) == 0 && !this.world.players.isEmpty()) {
             if (this.random.nextInt(50) <= 40) {
-                this.bD = ((CraftPlayer) this.getOwner()).getHandle();
+                this.bD = ((CraftPlayer) this.getPlayerOwner()).getHandle();
             } else {
                 this.bD = (Entity) this.world.players.get(this.random.nextInt(this.world.players.size()));
             }

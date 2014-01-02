@@ -1,12 +1,13 @@
 package io.github.dsh105.echopet.data;
 
-import io.github.dsh105.dshutils.logger.ConsoleLogger;
+import io.github.dsh105.dshutils.logger.Logger;
 import io.github.dsh105.dshutils.util.EnumUtil;
-import io.github.dsh105.echopet.EchoPet;
+import io.github.dsh105.dshutils.util.StringUtil;
+import io.github.dsh105.echopet.EchoPetPlugin;
 import io.github.dsh105.echopet.entity.Pet;
-import io.github.dsh105.echopet.entity.living.PetData;
 import io.github.dsh105.echopet.entity.PetType;
 import io.github.dsh105.echopet.entity.living.IAgeablePet;
+import io.github.dsh105.echopet.entity.living.PetData;
 import io.github.dsh105.echopet.entity.living.type.blaze.BlazePet;
 import io.github.dsh105.echopet.entity.living.type.creeper.CreeperPet;
 import io.github.dsh105.echopet.entity.living.type.enderman.EndermanPet;
@@ -22,10 +23,8 @@ import io.github.dsh105.echopet.entity.living.type.villager.VillagerPet;
 import io.github.dsh105.echopet.entity.living.type.wither.WitherPet;
 import io.github.dsh105.echopet.entity.living.type.wolf.WolfPet;
 import io.github.dsh105.echopet.entity.living.type.zombie.ZombiePet;
-import io.github.dsh105.dshutils.logger.Logger;
 import io.github.dsh105.echopet.util.Lang;
 import io.github.dsh105.echopet.util.PetUtil;
-import io.github.dsh105.dshutils.util.StringUtil;
 import io.github.dsh105.echopet.util.WorldUtil;
 import org.bukkit.DyeColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -40,11 +39,11 @@ import java.util.ListIterator;
 
 public class PetHandler {
 
-    private static EchoPet ec;
+    private static EchoPetPlugin ec;
 
     private ArrayList<Pet> pets = new ArrayList<Pet>();
 
-    public PetHandler(EchoPet ec) {
+    public PetHandler(EchoPetPlugin ec) {
         PetHandler.ec = ec;
     }
 
@@ -57,7 +56,7 @@ public class PetHandler {
     }
 
     public Pet loadPets(Player p, boolean findDefault, boolean sendMessage, boolean checkWorldOverride) {
-        EchoPet ec = EchoPet.getInstance();
+        EchoPetPlugin ec = EchoPetPlugin.getInstance();
         if (ec.options.sqlOverride()) {
             Pet pet = ec.SPH.createPetFromDatabase(p);
             if (pet == null) {
@@ -175,10 +174,10 @@ public class PetHandler {
 
     // *May* add support for multiple pets
     /*public List<Pet> getPets(Player player) {
-		List<Pet> tempList = new ArrayList<Pet>();
+        List<Pet> tempList = new ArrayList<Pet>();
 		
 		for (Pet pi : pets) {
-			if (pi.getOwner() == player) tempList.add(pi);
+			if (pi.getPlayerOwner() == player) tempList.add(pi);
 		}
 		
 		return tempList.isEmpty() ? null : tempList;
@@ -312,7 +311,7 @@ public class PetHandler {
         while (i.hasNext()) {
             Pet p = i.next();
             if (p.getOwner().getName().equals(player.getName())) {
-				/*saveFileData("autosave", p);
+                /*saveFileData("autosave", p);
 				ec.SPH.saveToDatabase(p, false);*/
                 p.removePet(makeDeathSound);
                 i.remove();

@@ -1,7 +1,7 @@
 package io.github.dsh105.echopet.util;
 
 
-import io.github.dsh105.echopet.EchoPet;
+import io.github.dsh105.echopet.EchoPetPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,11 +10,12 @@ public enum Lang {
 
     PREFIX("prefix", "&4[&cEchoPet&4]&r"),
 
+    HELP("help", "&eUse &6/%cmd% &efor help."),
     NO_PERMISSION("no_permission", "&6%perm% &epermission needed to do that."),
     PETS_DISABLED_HERE("pets_disabled_here", "&ePets are not allowed here."),
     ENTER_PET_DISABLED_REGION("enter_pet_disabled_region", "&eEntering region that does not allow Pets. Yours has been hidden."),
-    ADMIN_COMMAND_ERROR("admin_cmd_error", "&eError for input string: &6%cmd%&e. Use /" + EchoPet.getInstance().adminCmdString + " for help"),
-    COMMAND_ERROR("cmd_error", "&eError for input string: &6%cmd%&e. Use /" + EchoPet.getInstance().cmdString + " for help."),
+    ADMIN_COMMAND_ERROR("admin_cmd_error", "&eError for input string: &6%cmd%&e. Use /" + EchoPetPlugin.getInstance().adminCmdString + " for help"),
+    COMMAND_ERROR("cmd_error", "&eError for input string: &6%cmd%&e. Use /" + EchoPetPlugin.getInstance().cmdString + " for help."),
     IN_GAME_ONLY("in_game_only", "&6%cmd% &ecan only be used in-game."),
     STRING_ERROR("string_error", "&eError parsing String: [&6%string%&e]. Please revise command arguments."),
 
@@ -75,6 +76,7 @@ public enum Lang {
     ADMIN_HAT_PET_ON("admin_hat_pet_on", "&6%player%&e's pet now rides on their head."),
     ADMIN_HAT_PET_OFF("admin_hat_pet_off", "&6%player%&e's pet no longer rides on their head."),
     ADMIN_NULL_PLAYER("admin_null_player", "&6%player% &eis not online or does not exist."),
+    ADMIN_NULL_PLAYER_DATA("admin_null_player_data", "&ePet data for &6%player% &edoes not exist."),
     ADMIN_PET_REMOVED("admin_pet_removed", "&6%player%&e's Pet has been removed."),
     ADMIN_NAME_MOUNT("admin_name_mount", "&6%player%&e's &ePet's mount has been named to &r%name%&e."),
     ADMIN_NAME_PET("admin_name_pet", "&6%player%&e's &6%type% &ehas been named &r%name%&e."),
@@ -109,27 +111,27 @@ public enum Lang {
 
     public static void sendTo(CommandSender sender, String msg) {
         if (msg != null || !msg.equalsIgnoreCase("") && !msg.equalsIgnoreCase(" ") && !msg.equalsIgnoreCase("none")) {
-            sender.sendMessage(EchoPet.getInstance().prefix + " " + msg);
+            sender.sendMessage(EchoPetPlugin.getInstance().prefix + " " + msg);
         }
     }
 
     public static void sendTo(Player p, String msg) {
         if (msg != null && !msg.equalsIgnoreCase("") && !msg.equalsIgnoreCase(" ") && !(msg.equalsIgnoreCase("none"))) {
-            p.sendMessage(EchoPet.getInstance().prefix + " " + msg);
+            p.sendMessage(EchoPetPlugin.getInstance().prefix + " " + msg);
         }
     }
 
     @Override
     public String toString() {
-        String result = EchoPet.getInstance().getLangConfig().getString(this.path, this.def);
+        String result = EchoPetPlugin.getInstance().getLangConfig().getString(this.path, this.def);
         if (result != null && result != "" && result != "none") {
-            return ChatColor.translateAlternateColorCodes('&', EchoPet.getInstance().getLangConfig().getString(this.path, this.def));
+            return ChatColor.translateAlternateColorCodes('&', EchoPetPlugin.getInstance().getLangConfig().getString(this.path, this.def));
         } else {
             return "";
         }
     }
 
     public String toString_() {
-        return EchoPet.getInstance().getLangConfig().getString(this.path, this.def);
+        return EchoPetPlugin.getInstance().getLangConfig().getString(this.path, this.def);
     }
 }

@@ -2,13 +2,12 @@ package io.github.dsh105.echopet.util;
 
 import io.github.dsh105.dshutils.util.EnumUtil;
 import io.github.dsh105.dshutils.util.StringUtil;
-import io.github.dsh105.echopet.EchoPet;
-import io.github.dsh105.echopet.entity.Pet;
-import io.github.dsh105.echopet.entity.living.PetData;
-import io.github.dsh105.echopet.entity.PetType;
+import io.github.dsh105.echopet.EchoPetPlugin;
 import io.github.dsh105.echopet.data.UnorganisedPetData;
+import io.github.dsh105.echopet.entity.Pet;
+import io.github.dsh105.echopet.entity.PetType;
 import io.github.dsh105.echopet.entity.living.IAgeablePet;
-import io.github.dsh105.echopet.entity.living.LivingPet;
+import io.github.dsh105.echopet.entity.living.PetData;
 import io.github.dsh105.echopet.entity.living.type.blaze.BlazePet;
 import io.github.dsh105.echopet.entity.living.type.creeper.CreeperPet;
 import io.github.dsh105.echopet.entity.living.type.enderman.EndermanPet;
@@ -38,7 +37,7 @@ public class PetUtil {
         return petType.toString().toLowerCase().replace("_", "");
     }
 
-    public static UnorganisedPetData formPetFromArgs(EchoPet ec, CommandSender sender, String s, boolean petAdmin) {
+    public static UnorganisedPetData formPetFromArgs(EchoPetPlugin ec, CommandSender sender, String s, boolean petAdmin) {
         String admin = petAdmin ? "admin" : "";
         String petString = s;
         String dataString = "";
@@ -47,6 +46,10 @@ public class PetUtil {
 
         if (s.contains(";")) {
             String[] split = s.split(";");
+            if (split.length <= 1) {
+                Lang.sendTo(sender, Lang.STRING_ERROR.toString().replace("%string%", s));
+                return null;
+            }
             if (split[0].contains(":")) {
                 String[] splitt = split[0].split(":");
                 if (splitt.length <= 1) {
@@ -198,7 +201,7 @@ public class PetUtil {
     }
 
 	/*private static boolean isPetType(String s) {
-		try {
+        try {
 			PetType.valueOf(s.toUpperCase());
 			return true;
 		} catch (Exception e) {

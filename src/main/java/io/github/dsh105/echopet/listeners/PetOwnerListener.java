@@ -1,19 +1,18 @@
 package io.github.dsh105.echopet.listeners;
 
 import io.github.dsh105.dshutils.util.GeometryUtil;
-import io.github.dsh105.echopet.EchoPet;
+import io.github.dsh105.dshutils.util.StringUtil;
+import io.github.dsh105.echopet.EchoPetPlugin;
 import io.github.dsh105.echopet.api.event.PetInteractEvent;
 import io.github.dsh105.echopet.data.PetHandler;
+import io.github.dsh105.echopet.entity.CraftPet;
 import io.github.dsh105.echopet.entity.Pet;
-import io.github.dsh105.echopet.entity.living.CraftLivingPet;
-import io.github.dsh105.echopet.entity.living.LivingPet;
-import io.github.dsh105.echopet.entity.living.type.human.EntityHumanPet;
-import io.github.dsh105.echopet.entity.living.type.human.HumanPet;
+import io.github.dsh105.echopet.entity.inanimate.EntityInanimatePet;
+import io.github.dsh105.echopet.entity.inanimate.InanimatePet;
 import io.github.dsh105.echopet.menu.selector.PetSelector;
 import io.github.dsh105.echopet.menu.selector.SelectorItem;
 import io.github.dsh105.echopet.mysql.SQLPetHandler;
 import io.github.dsh105.echopet.util.Lang;
-import io.github.dsh105.dshutils.util.StringUtil;
 import io.github.dsh105.echopet.util.WorldUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_7_R1.entity.CraftPlayer;
@@ -47,11 +46,11 @@ public class PetOwnerListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         Player p = event.getPlayer();
         Entity e = event.getRightClicked();
-        if (e instanceof CraftLivingPet) {
-            LivingPet pet = ((CraftLivingPet) e).getPet();
+        if (e instanceof CraftPet) {
+            Pet pet = ((CraftPet) e).getPet();
             event.setCancelled(true);
             PetInteractEvent iEvent = new PetInteractEvent(pet, p, PetInteractEvent.Action.RIGHT_CLICK, false);
-            EchoPet.getInstance().getServer().getPluginManager().callEvent(iEvent);
+            EchoPetPlugin.getInstance().getServer().getPluginManager().callEvent(iEvent);
             if (!iEvent.isCancelled()) {
                 pet.getEntityPet().a(((CraftPlayer) p).getHandle());
             }
@@ -78,9 +77,9 @@ public class PetOwnerListener implements Listener {
         Iterator<Pet> i = PetHandler.getInstance().getPets().iterator();
         while (i.hasNext()) {
             Pet pet = i.next();
-            if (pet instanceof HumanPet && ((EntityHumanPet) pet.getEntityPet()).hasInititiated()) {
+            if (pet instanceof InanimatePet && ((EntityInanimatePet) pet.getEntityPet()).hasInititiated()) {
                 if (GeometryUtil.getNearbyEntities(event.getTo(), 50).contains(pet)) {
-                    ((EntityHumanPet) pet.getEntityPet()).updatePacket();
+                    ((EntityInanimatePet) pet.getEntityPet()).updatePacket();
                 }
             }
         }
@@ -101,7 +100,7 @@ public class PetOwnerListener implements Listener {
                         PetHandler.getInstance().loadPets(p, false, false, false);
                     }
 
-                }.runTaskLater(EchoPet.getInstance(), 20L);
+                }.runTaskLater(EchoPetPlugin.getInstance(), 20L);
             } else {
                 PetHandler.getInstance().saveFileData("autosave", pi);
                 SQLPetHandler.getInstance().saveToDatabase(pi, false);
@@ -118,7 +117,7 @@ public class PetOwnerListener implements Listener {
                         PetHandler.getInstance().loadPets(p, false, false, false);
                     }
 
-                }.runTaskLater(EchoPet.getInstance(), 20L);
+                }.runTaskLater(EchoPetPlugin.getInstance(), 20L);
             }
         }
     }
@@ -137,7 +136,7 @@ public class PetOwnerListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        EchoPet ec = EchoPet.getInstance();
+        EchoPetPlugin ec = EchoPetPlugin.getInstance();
         final Player p = event.getPlayer();
         Inventory inv = p.getInventory();
         if (ec.update && p.hasPermission("echopet.update")) {
@@ -184,9 +183,9 @@ public class PetOwnerListener implements Listener {
         Iterator<Pet> i = PetHandler.getInstance().getPets().iterator();
         while (i.hasNext()) {
             Pet pet = i.next();
-            if (pet instanceof HumanPet && ((EntityHumanPet) pet.getEntityPet()).hasInititiated()) {
+            if (pet instanceof InanimatePet && ((EntityInanimatePet) pet.getEntityPet()).hasInititiated()) {
                 if (GeometryUtil.getNearbyEntities(event.getPlayer().getLocation(), 50).contains(pet)) {
-                    ((EntityHumanPet) pet.getEntityPet()).updatePacket();
+                    ((EntityInanimatePet) pet.getEntityPet()).updatePacket();
                 }
             }
         }

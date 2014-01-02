@@ -2,13 +2,13 @@ package io.github.dsh105.echopet.entity;
 
 import io.github.dsh105.dshutils.Particle;
 import io.github.dsh105.dshutils.logger.Logger;
-import io.github.dsh105.echopet.EchoPet;
+import io.github.dsh105.dshutils.util.StringUtil;
+import io.github.dsh105.echopet.EchoPetPlugin;
 import io.github.dsh105.echopet.api.event.PetTeleportEvent;
 import io.github.dsh105.echopet.entity.living.EntityLivingPet;
 import io.github.dsh105.echopet.entity.living.EntityNoClipPet;
 import io.github.dsh105.echopet.entity.living.PetData;
 import io.github.dsh105.echopet.util.Lang;
-import io.github.dsh105.dshutils.util.StringUtil;
 import net.minecraft.server.v1_7_R1.Entity;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_7_R1.entity.CraftPlayer;
@@ -38,23 +38,23 @@ public abstract class Pet {
         this.isLiving = this.petType.getEntityClass().equals(EntityLivingPet.class);
     }
 
-    protected abstract IEntityPet initiatePet();
+    protected abstract EntityPet initiatePet();
 
     /**
-     * Gets the {@link IEntityPet} for this {@link Pet}
+     * Gets the {@link EntityPet} for this {@link Pet}
      *
-     * @return a {@link IEntityPet} object for this {@link Pet}
+     * @return a {@link EntityPet} object for this {@link Pet}
      */
-    public abstract IEntityPet getEntityPet();
+    public abstract EntityPet getEntityPet();
 
     /**
-     * Gets the {@link ICraftPet} for this {@link Pet}
+     * Gets the {@link CraftPet} for this {@link Pet}
      *
-     * @return a {@link ICraftPet} object for this {@link Pet}
+     * @return a {@link CraftPet} object for this {@link Pet}
      */
-    public abstract ICraftPet getCraftPet();
+    public abstract CraftPet getCraftPet();
 
-    public abstract ICraftPet setCraftPet(ICraftPet craftPet);
+    public abstract CraftPet setCraftPet(CraftPet craftPet);
 
     public Location getLocation() {
         return this.getCraftPet().getLocation();
@@ -129,7 +129,9 @@ public abstract class Pet {
      * @param name new name of this {@link io.github.dsh105.echopet.entity.Pet}
      */
     public void setName(String name) {
-        this.name = name;
+        this.name = StringUtil.replaceStringWithColours(name);
+        this.getCraftPet().setCustomName(this.name);
+        this.getCraftPet().setCustomNameVisible((Boolean) EchoPetPlugin.getInstance().options.getConfigOption("pets." + this.getPetType().toString().toLowerCase().replace("_", " ") + ".tagVisible", true));
     }
 
     /**
@@ -181,7 +183,7 @@ public abstract class Pet {
      */
     public void teleport(Location to) {
         PetTeleportEvent teleportEvent = new PetTeleportEvent(this, this.getLocation(), to);
-        EchoPet.getInstance().getServer().getPluginManager().callEvent(teleportEvent);
+        EchoPetPlugin.getInstance().getServer().getPluginManager().callEvent(teleportEvent);
         if (teleportEvent.isCancelled()) {
             return;
         }
@@ -226,26 +228,27 @@ public abstract class Pet {
         if (this.isHat) {
             this.setAsHat(false);
         }
-        this.teleportToOwner();
         if (!flag) {
             ((CraftPlayer) this.owner).getHandle().mount(null);
             if (this.getEntityPet() instanceof EntityNoClipPet) {
                 ((EntityNoClipPet) this.getEntityPet()).noClip(true);
             }
+            ownerIsMounting = false;
         } else {
             if (this.getMount() != null) {
                 this.getMount().removePet(false);
             }
             new BukkitRunnable() {
                 public void run() {
-                    ((CraftPlayer) owner).getHandle().mount((Entity) getEntityPet());
+                    ((CraftPlayer) owner).getHandle().mount(getEntityPet());
                     ownerIsMounting = false;
                     if (getEntityPet() instanceof EntityNoClipPet) {
                         ((EntityNoClipPet) getEntityPet()).noClip(false);
                     }
                 }
-            }.runTaskLater(EchoPet.getInstance(), 5L);
+            }.runTaskLater(EchoPetPlugin.getInstance(), 5L);
         }
+        this.teleportToOwner();
         this.ownerRiding = flag;
         try {
             Particle.PORTAL.sendTo(this.getLocation());
@@ -306,7 +309,7 @@ public abstract class Pet {
      * @return a new Pet object that is mounting this {@link io.github.dsh105.echopet.entity.Pet}
      */
     public Pet createMount(final PetType pt, boolean sendFailMessage) {
-        if (!EchoPet.getInstance().options.allowMounts(this.petType)) {
+        if (!EchoPetPlugin.getInstance().options.allowMounts(this.petType)) {
             if (sendFailMessage) {
                 Lang.sendTo(this.owner, Lang.MOUNTS_DISABLED.toString().replace("%type%", StringUtil.capitalise(this.petType.toString())));
             }
@@ -324,9 +327,9 @@ public abstract class Pet {
         new BukkitRunnable() {
             public void run() {
                 getCraftPet().setPassenger(mount.getCraftPet());
-                EchoPet.getInstance().SPH.saveToDatabase(mount, true);
+                EchoPetPlugin.getInstance().SPH.saveToDatabase(mount, true);
             }
-        }.runTaskLater(EchoPet.getInstance(), 5L);
+        }.runTaskLater(EchoPetPlugin.getInstance(), 5L);
 
         return this.mount;
     }

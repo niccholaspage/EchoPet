@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import io.github.dsh105.echopet.EchoPet;
+import io.github.dsh105.echopet.EchoPetPlugin;
 import io.github.dsh105.echopet.entity.PetType;
 import io.github.dsh105.echopet.mysql.SQLPetHandler;
 import io.github.dsh105.echopet.util.PetUtil;
@@ -18,36 +18,36 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public enum PetItem {
-    BAT(PetType.BAT, Material.getMaterial(383), 1, (short) 65,  "Bat Pet"),
-    BLAZE(PetType.BLAZE, Material.getMaterial(383), 1, (short) 61,  "Blaze Pet"),
-    CAVESPIDER(PetType.CAVESPIDER, Material.getMaterial(383), 1, (short) 59,  "Cave Spider Pet"),
-    CHICKEN(PetType.CHICKEN, Material.getMaterial(383), 1, (short) 93,  "Chicken Pet"),
-    COW(PetType.COW, Material.getMaterial(383), 1, (short) 92,  "Cow Pet"),
-    CREEPER(PetType.CREEPER, Material.getMaterial(383), 1, (short) 50,  "Creeper Pet"),
-    ENDERDRAGON(PetType.ENDERDRAGON, Material.getMaterial(122), 1, (short) 0,  "EnderDragon Pet"),
-    ENDERMAN(PetType.ENDERMAN, Material.getMaterial(383), 1, (short) 58,  "Enderman Pet"),
-    GHAST(PetType.GHAST, Material.getMaterial(383), 1, (short) 56,  "Ghast Pet"),
-    GIANT(PetType.GIANT, Material.getMaterial(383), 1, (short) 54,  "Giant Pet"),
-    HORSE(PetType.HORSE, Material.getMaterial(383), 1, (short) 100,  "Horse Pet"),
+    BAT(PetType.BAT, Material.getMaterial(383), 1, (short) 65, "Bat Pet"),
+    BLAZE(PetType.BLAZE, Material.getMaterial(383), 1, (short) 61, "Blaze Pet"),
+    CAVESPIDER(PetType.CAVESPIDER, Material.getMaterial(383), 1, (short) 59, "Cave Spider Pet"),
+    CHICKEN(PetType.CHICKEN, Material.getMaterial(383), 1, (short) 93, "Chicken Pet"),
+    COW(PetType.COW, Material.getMaterial(383), 1, (short) 92, "Cow Pet"),
+    CREEPER(PetType.CREEPER, Material.getMaterial(383), 1, (short) 50, "Creeper Pet"),
+    ENDERDRAGON(PetType.ENDERDRAGON, Material.getMaterial(122), 1, (short) 0, "EnderDragon Pet"),
+    ENDERMAN(PetType.ENDERMAN, Material.getMaterial(383), 1, (short) 58, "Enderman Pet"),
+    GHAST(PetType.GHAST, Material.getMaterial(383), 1, (short) 56, "Ghast Pet"),
+    GIANT(PetType.GIANT, Material.getMaterial(383), 1, (short) 54, "Giant Pet"),
+    HORSE(PetType.HORSE, Material.getMaterial(383), 1, (short) 100, "Horse Pet"),
     HUMAN(PetType.HUMAN, Material.SKULL_ITEM, 1, (short) 3, "Human Pet"),
-    IRONGOLEM(PetType.IRONGOLEM, Material.getMaterial(86), 1, (short) 0,  "Iron Golem Pet"),
-    MAGMACUBE(PetType.MAGMACUBE, Material.getMaterial(383), 1, (short) 62,  "Magma Cube Pet"),
-    MUSHROOMCOW(PetType.MUSHROOMCOW, Material.getMaterial(383), 1, (short) 96,  "Mushroom Cow Pet"),
-    OCELOT(PetType.OCELOT, Material.getMaterial(383), 1, (short) 98,  "Ocelot Pet"),
-    PIG(PetType.PIG, Material.getMaterial(383), 1, (short) 90,  "Pig Pet"),
-    PIGZOMBIE(PetType.PIGZOMBIE, Material.getMaterial(383), 1, (short) 57,  "PigZombie Pet"),
-    SHEEP(PetType.SHEEP, Material.getMaterial(383), 1, (short) 91,  "Sheep Pet"),
-    SILVERFISH(PetType.SILVERFISH, Material.getMaterial(383), 1, (short) 60,  "Silverfish Pet"),
-    SKELETON(PetType.SKELETON, Material.getMaterial(383), 1, (short) 51,  "Skeleton Pet"),
-    SLIME(PetType.SLIME, Material.getMaterial(383), 1, (short) 55,  "Slime Pet"),
-    SNOWMAN(PetType.SNOWMAN, Material.getMaterial(332), 1, (short) 0,  "Snowman Pet"),
-    SPIDER(PetType.SPIDER, Material.getMaterial(383), 1, (short) 52,  "Spider Pet"),
-    SQUID(PetType.SQUID, Material.getMaterial(383), 1, (short) 94,  "Squid Pet"),
-    VILLAGER(PetType.VILLAGER, Material.getMaterial(383), 1, (short) 120,  "Villager Pet"),
-    WITCH(PetType.WITCH, Material.getMaterial(383), 1, (short) 66,  "Witch Pet"),
-    WITHER(PetType.WITHER, Material.getMaterial(399), 1, (short) 0,  "Wither Pet"),
-    WOLF(PetType.WOLF, Material.getMaterial(383), 1, (short) 95,  "Wolf Pet"),
-    ZOMBIE(PetType.ZOMBIE, Material.getMaterial(383), 1, (short) 54,  "Zombie Pet");
+    IRONGOLEM(PetType.IRONGOLEM, Material.getMaterial(86), 1, (short) 0, "Iron Golem Pet"),
+    MAGMACUBE(PetType.MAGMACUBE, Material.getMaterial(383), 1, (short) 62, "Magma Cube Pet"),
+    MUSHROOMCOW(PetType.MUSHROOMCOW, Material.getMaterial(383), 1, (short) 96, "Mushroom Cow Pet"),
+    OCELOT(PetType.OCELOT, Material.getMaterial(383), 1, (short) 98, "Ocelot Pet"),
+    PIG(PetType.PIG, Material.getMaterial(383), 1, (short) 90, "Pig Pet"),
+    PIGZOMBIE(PetType.PIGZOMBIE, Material.getMaterial(383), 1, (short) 57, "PigZombie Pet"),
+    SHEEP(PetType.SHEEP, Material.getMaterial(383), 1, (short) 91, "Sheep Pet"),
+    SILVERFISH(PetType.SILVERFISH, Material.getMaterial(383), 1, (short) 60, "Silverfish Pet"),
+    SKELETON(PetType.SKELETON, Material.getMaterial(383), 1, (short) 51, "Skeleton Pet"),
+    SLIME(PetType.SLIME, Material.getMaterial(383), 1, (short) 55, "Slime Pet"),
+    SNOWMAN(PetType.SNOWMAN, Material.getMaterial(332), 1, (short) 0, "Snowman Pet"),
+    SPIDER(PetType.SPIDER, Material.getMaterial(383), 1, (short) 52, "Spider Pet"),
+    SQUID(PetType.SQUID, Material.getMaterial(383), 1, (short) 94, "Squid Pet"),
+    VILLAGER(PetType.VILLAGER, Material.getMaterial(383), 1, (short) 120, "Villager Pet"),
+    WITCH(PetType.WITCH, Material.getMaterial(383), 1, (short) 66, "Witch Pet"),
+    WITHER(PetType.WITHER, Material.getMaterial(399), 1, (short) 0, "Wither Pet"),
+    WOLF(PetType.WOLF, Material.getMaterial(383), 1, (short) 95, "Wolf Pet"),
+    ZOMBIE(PetType.ZOMBIE, Material.getMaterial(383), 1, (short) 54, "Zombie Pet");
 
     public PetType petType;
     private Material mat;
@@ -74,7 +74,7 @@ public enum PetItem {
 
 		ArrayList<String> lore = new ArrayList<String>();
 
-		EchoPet plugin = EchoPet.getInstance();
+		EchoPetPlugin plugin = EchoPetPlugin.getInstance();
 
 		String loreDesc = plugin.options.getLore(petType);
 
@@ -105,7 +105,7 @@ public enum PetItem {
 	public static PetItem[] valuesByCost(final Player p){
 		List<PetItem> petItems = new ArrayList<PetItem>(Arrays.asList(values()));
 
-		final EchoPet plugin = EchoPet.getInstance();
+		final EchoPetPlugin plugin = EchoPetPlugin.getInstance();
 		
 		Collections.sort(petItems, new Comparator<PetItem>() {
 			@Override
