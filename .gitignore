@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-.settings/
-bin/
-target/
-build/
-repos/
-lib/
-Fe.jar
-.gradle/
-.classpath
-.project
-=======
 # Eclipse
 /.classpath
 /.project
@@ -37,5 +25,10 @@ dependency-reduced-pom.xml
 /world
 
 # Mac filesystem dust
->>>>>>> upstream/master
 .DS_Store
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
